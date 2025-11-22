@@ -7,7 +7,7 @@ export default function About() {
 
       <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-center">
         <img
-          src="/nonna.jpg"
+          src="/images/cadagnolo.png"
           alt="Nonna Cadagnolo"
           className="rounded-xl shadow-md"
         />
