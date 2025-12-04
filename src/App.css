@@ -1,42 +1,103 @@
+/* Additional app-specific styles */
+
 #root {
-  max-width: 1280px;
+  width: 100%;
+  min-height: 100vh;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Center all content */
+body {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Ensure full-width sections */
+section {
+  width: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Smooth scrolling with offset for fixed navbar */
+html {
+  scroll-padding-top: 120px;
 }
 
-.card {
-  padding: 2em;
+/* Navbar underline animation */
+.nav-link:hover .nav-underline {
+  width: 100%;
+  transition: width 0.3s ease-in-out;
 }
 
-.read-the-docs {
-  color: #888;
+.nav-underline {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Custom scrollbar styling (optional) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fef3e2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #881337;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #701a2f;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #881337 #fef3e2;
+}
+
+/* Prevent horizontal scroll */
+body, html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Improve image loading */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Ensure proper aspect ratios */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+/* Better focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid #881337;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Smooth transitions for layout shifts */
+* {
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure images don't stretch */
+img[src*=".jpg"],
+img[src*=".png"],
+img[src*=".jpeg"] {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }

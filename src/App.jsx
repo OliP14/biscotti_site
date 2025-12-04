@@ -5,7 +5,7 @@ import About from "./components/About";
 import Collection from "./components/Collection";
 import Contact from "./components/Contact";
 import ProductPage from "./pages/ProductPage";
-import './App.css'
+import "./App.css";
 
 export default function App() {
   return (

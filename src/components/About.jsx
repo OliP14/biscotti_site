@@ -1,34 +1,95 @@
+import { useState, useEffect } from "react";
+
 export default function About() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.2 }
+    );
+
+    const element = document.getElementById("about");
+    if (element) observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="about" className="py-20 px-6 bg-[#FFF8F0]">
-      <h2 className="text-4xl font-serif text-center text-rose-900 mb-10">
-        Our Story
-      </h2>
+    <section
+      id="about"
+      className="py-32 px-6 bg-gradient-to-b from-white to-amber-50/50"
+    >
+      <div className="max-w-7xl mx-auto">
+        <div
+          className={`text-center mb-16 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <h2 className="text-5xl font-serif text-rose-900 mb-4">Our Story</h2>
+          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full"></div>
+        </div>
 
-      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-center">
-        <img
-          src="/images/cadagnolo.png"
-          alt="Nonna Cadagnolo"
-          className="rounded-xl shadow-md"
-        />
+        <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
+          <div
+            className={`transition-all duration-1000 delay-200 ${
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 -translate-x-10"
+            }`}
+          >
+            <div className="w-full max-w-lg mx-auto">
+              <img
+                src="/images/cadagnolo.png"
+                alt="Nonna Cadagnolo"
+                className="rounded-2xl shadow-2xl w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
+                style={{ maxHeight: "500px" }}
+              />
+            </div>
+          </div>
 
-        <div className="text-rose-900 text-lg">
-          <p className="mb-4">
-            Cadagnolo’s Kitchen began in a tiny Italian village where our Nonna
-            perfected her biscotti recipe using simple, wholesome ingredients.
-          </p>
-          <p>
-            Today, we continue her tradition by handcrafting every batch with
-            the same love, care, and timeless Italian technique.
-          </p>
+          <div
+            className={`space-y-6 transition-all duration-1000 delay-300 ${
+              isVisible
+                ? "opacity-100 translate-x-0"
+                : "opacity-0 translate-x-10"
+            }`}
+          >
+            <p className="text-rose-900 text-xl leading-relaxed">
+              Cadagnolo's Kitchen began in a tiny Italian village where our
+              Nonna perfected her biscotti recipe using simple, wholesome
+              ingredients.
+            </p>
+            <p className="text-rose-800 text-lg leading-relaxed">
+              Today, we continue her tradition by handcrafting every batch with
+              the same love, care, and timeless Italian technique that has been
+              passed down through our family for generations.
+            </p>
+            <div className="pt-4">
+              <div className="inline-block bg-rose-100 text-rose-900 px-6 py-3 rounded-full font-medium">
+                ✨ Handcrafted with Love Since 1950
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={`transition-all duration-1000 delay-500 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <div className="w-full max-w-5xl mx-auto">
+            <img
+              src="/images/chefs.jpg"
+              alt="Chefs Baking"
+              className="rounded-2xl shadow-2xl w-full h-auto object-cover hover:scale-[1.02] transition-transform duration-500"
+              style={{ maxHeight: "600px" }}
+            />
+          </div>
         </div>
       </div>
-
-      <img
-        src="/images/chefs.jpg"
-        alt="Chefs Baking"
-        className="rounded-xl shadow-md mt-10 max-w-4xl mx-auto"
-      />
     </section>
   );
 }

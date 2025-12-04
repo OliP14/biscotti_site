@@ -1,20 +1,71 @@
+import { useState, useEffect } from "react";
+
 export default function Hero() {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <section
       id="hero"
-      className="h-screen bg-cover bg-center flex flex-col justify-center items-center text-center px-6"
-      style={{
-        backgroundImage: "url('/images/biscotti_bg.jpg')",
-      }}
+      className="h-screen relative flex items-center justify-center overflow-hidden"
     >
-      <div className="bg-white/70 p-8 rounded-xl shadow-lg max-w-2xl">
-        <h1 className="text-5xl font-serif text-rose-900 mb-4">
+      {/* Parallax Background */}
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50"
+        style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+      />
+
+      {/* Decorative Elements */}
+      <div
+        className="absolute top-20 right-20 w-64 h-64 bg-rose-200/30 rounded-full blur-3xl"
+        style={{ transform: `translateY(${scrollY * 0.3}px)` }}
+      />
+      <div
+        className="absolute bottom-20 left-20 w-96 h-96 bg-amber-200/30 rounded-full blur-3xl"
+        style={{ transform: `translateY(${scrollY * 0.4}px)` }}
+      />
+
+      {/* Content */}
+      <div
+        className="relative z-10 text-center px-6 max-w-4xl"
+        style={{ transform: `translateY(${scrollY * 0.2}px)` }}
+      >
+        <div className="mb-6 inline-block">
+          <div className="w-24 h-1 bg-rose-900 mx-auto mb-8 rounded-full"></div>
+        </div>
+
+        <h1 className="text-7xl font-serif text-rose-900 mb-6 leading-tight">
           Cadagnolo's Kitchen
         </h1>
-        <p className="text-lg text-rose-800">
-          Handcrafted Italian biscotti, baked with love using recipes passed down
-          through generations.
+
+        <p className="text-2xl text-rose-800 mb-8 font-light leading-relaxed">
+          Handcrafted Italian biscotti, baked with love
+          <br />
+          using recipes passed down through generations
         </p>
+
+        <button
+          onClick={() =>
+            document
+              .getElementById("collection")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+          className="bg-rose-900 text-white px-10 py-4 rounded-full hover:bg-rose-800 transition-all transform hover:scale-105 shadow-lg text-lg font-medium"
+        >
+          Explore Our Collection
+        </button>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="w-6 h-10 border-2 border-rose-900 rounded-full flex justify-center">
+          <div className="w-1.5 h-3 bg-rose-900 rounded-full mt-2 animate-pulse"></div>
+        </div>
       </div>
     </section>
   );

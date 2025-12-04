@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const products = [
@@ -7,29 +8,88 @@ const products = [
 ];
 
 export default function Collection() {
-  return (
-    <section id="collection" className="py-20 px-6 bg-white">
-      <h2 className="text-4xl font-serif text-center text-rose-900 mb-10">
-        Biscotti Collection
-      </h2>
+  const [hoveredId, setHoveredId] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
-        {products.map((product) => (
-          <Link
-            to={`/product/${product.id}`}
-            key={product.id}
-            className="block bg-[#FFF8F0] rounded-xl shadow-md hover:shadow-lg transition p-4"
-          >
-            <img
-              src={product.img}
-              alt={product.name}
-              className="rounded-lg mb-4"
-            />
-            <h3 className="text-xl text-rose-900 font-semibold text-center">
-              {product.name}
-            </h3>
-          </Link>
-        ))}
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.15 }
+    );
+
+    const element = document.getElementById("collection");
+    if (element) observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section id="collection" className="py-32 px-6 bg-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-20">
+          <h2 className="text-5xl font-serif text-rose-900 mb-4">
+            Biscotti Collection
+          </h2>
+          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full mb-6"></div>
+          <p className="text-rose-800 text-xl max-w-2xl mx-auto">
+            Each variety crafted with authentic Italian tradition and the finest
+            ingredients
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          {products.map((product, index) => (
+            <Link
+              to={`/product/${product.id}`}
+              key={product.id}
+              className="group block"
+              onMouseEnter={() => setHoveredId(product.id)}
+              onMouseLeave={() => setHoveredId(null)}
+            >
+              <div
+                className={`bg-gradient-to-br from-amber-50 to-rose-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-10"
+                }`}
+                style={{
+                  transitionDelay: isVisible ? `${index * 100}ms` : "0ms",
+                }}
+              >
+                <div className="relative overflow-hidden aspect-square">
+                  <img
+                    src={product.img}
+                    alt={product.name}
+                    className={`w-full h-full object-cover transition-transform duration-700 ${
+                      hoveredId === product.id ? "scale-110" : "scale-100"
+                    }`}
+                    style={{ objectFit: "cover" }}
+                  />
+                  <div
+                    className={`absolute inset-0 bg-rose-900/20 transition-opacity duration-500 ${
+                      hoveredId === product.id ? "opacity-100" : "opacity-0"
+                    }`}
+                  ></div>
+                </div>
+
+                <div className="p-6 text-center">
+                  <h3 className="text-2xl text-rose-900 font-serif font-semibold mb-2">
+                    {product.name}
+                  </h3>
+                  <div
+                    className={`text-rose-700 transition-all duration-300 ${
+                      hoveredId === product.id ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    Discover More →
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
