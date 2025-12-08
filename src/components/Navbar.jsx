@@ -18,8 +18,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out ${
-        scrolled ? "bg-white shadow-lg py-5" : "bg-white/95 backdrop-blur-md py-10"
+      className={`border-20 border-white fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out ${
+        scrolled ? "bg-white shadow-lg border-t-10 border-b-10" : "bg-white/95 backdrop-blur-md"
       }`}
     >
       <div className="w-full px-16 md:px-24 lg:px-32 flex justify-between items-center">

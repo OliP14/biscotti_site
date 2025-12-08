@@ -16,7 +16,7 @@ export default function Hero() {
     >
       {/* Parallax Background */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50"
+        className="absolute inset-0 bg-linear-to-br from-amber-50 via-rose-50 to-orange-50"
         style={{ transform: `translateY(${scrollY * 0.5}px)` }}
       />
 
@@ -35,15 +35,17 @@ export default function Hero() {
         className="relative z-10 text-center px-6 max-w-4xl"
         style={{ transform: `translateY(${scrollY * 0.2}px)` }}
       >
-        <div className="mb-6 inline-block">
-          <div className="w-24 h-1 bg-rose-900 mx-auto mb-8 rounded-full"></div>
+        <div className="inline-block" style={{ marginBottom: '1rem' }}>
+          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full" style={{ marginBottom: '1rem' }}></div>
         </div>
 
-        <h1 className="text-7xl font-serif text-rose-900 mb-6 leading-tight">
+        <h1 className="text-7xl font-serif text-rose-900 leading-tight"
+        style={{ marginBottom: '1.5rem' }}>
           Cadagnolo's Kitchen
         </h1>
 
-        <p className="text-2xl text-rose-800 mb-8 font-light leading-relaxed">
+        <p className="text-2xl text-rose-800 font-light leading-relaxed"
+        style={{ marginBottom: '2rem' }}>
           Handcrafted Italian biscotti, baked with love
           <br />
           using recipes passed down through generations
@@ -56,6 +58,7 @@ export default function Hero() {
               ?.scrollIntoView({ behavior: "smooth" })
           }
           className="bg-rose-900 text-white px-10 py-4 rounded-full hover:bg-rose-800 transition-all transform hover:scale-105 shadow-lg text-lg font-medium"
+          style={{ minWidth: '260px', minHeight: '60px' }}
         >
           Explore Our Collection
         </button>
