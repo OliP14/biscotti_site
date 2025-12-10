@@ -21,14 +21,14 @@ export default function About() {
     <section
       id="about"
       className="bg-linear-to-b from-white to-amber-50/50"
-      style={{ paddingTop: '8rem', paddingBottom: '8rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
+      style={{ paddingTop: '8rem', paddingBottom: '8rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', display: 'flex', justifyContent: 'center' }}
     >
-      <div className="max-w-7xl mx-auto">
+      <div style={{ width: '100%', maxWidth: '90%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div
           className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
-          style={{ marginBottom: '4rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          style={{ marginBottom: '4rem', textAlign: 'center', display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center', width: '100%' }}
         >
           <h2 className="text-5xl font-serif text-rose-900" style={{ marginBottom: '1rem' }}>
             Our Story
@@ -36,7 +36,7 @@ export default function About() {
           <div className="w-24 h-1 bg-rose-900 rounded-full"></div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-center" style={{ marginBottom: '5rem' }}>
+        <div className="grid md:grid-cols-2 items-center" style={{ gap: '4rem', marginBottom: '5rem', width: '100%', maxWidth: '1200px' }}>
           <div
             className={`transition-all duration-1000 delay-200 ${
               isVisible
@@ -44,12 +44,12 @@ export default function About() {
                 : "opacity-0 -translate-x-10"
             }`}
           >
-            <div className="w-full mx-auto" style={{ maxWidth: '400px' }}>
+            <div style={{ maxWidth: '400px', width: '100%' }}>
               <img
                 src="/images/cadagnolo.png"
                 alt="Nonna Cadagnolo"
                 className="rounded-2xl shadow-2xl w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
-                style={{ aspectRatio: '1/1', objectFit: 'cover' }}
+                style={{ width: '100%', height: 'auto', aspectRatio: '1/1', objectFit: 'cover' }}
               />
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function About() {
               src="/images/chefs.jpg"
               alt="Chefs Baking"
               className="rounded-2xl shadow-2xl w-full h-auto object-cover hover:scale-[1.02] transition-transform duration-500"
-              style={{ aspectRatio: '16/9', objectFit: 'cover' }}
+              style={{ width: '100%', height: 'auto', aspectRatio: '16/9', objectFit: 'cover' }}
             />
           </div>
         </div>
