@@ -20,19 +20,23 @@ export default function About() {
   return (
     <section
       id="about"
-      className="py-32 px-6 bg-gradient-to-b from-white to-amber-50/50"
+      className="bg-linear-to-b from-white to-amber-50/50"
+      style={{ paddingTop: '8rem', paddingBottom: '8rem', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
     >
       <div className="max-w-7xl mx-auto">
         <div
-          className={`text-center mb-16 transition-all duration-1000 ${
+          className={`transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
+          style={{ marginBottom: '4rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         >
-          <h2 className="text-5xl font-serif text-rose-900 mb-4">Our Story</h2>
-          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full"></div>
+          <h2 className="text-5xl font-serif text-rose-900" style={{ marginBottom: '1rem' }}>
+            Our Story
+          </h2>
+          <div className="w-24 h-1 bg-rose-900 rounded-full"></div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
+        <div className="grid md:grid-cols-2 gap-16 items-center" style={{ marginBottom: '5rem' }}>
           <div
             className={`transition-all duration-1000 delay-200 ${
               isVisible
@@ -40,22 +44,23 @@ export default function About() {
                 : "opacity-0 -translate-x-10"
             }`}
           >
-            <div className="w-full max-w-lg mx-auto">
+            <div className="w-full mx-auto" style={{ maxWidth: '400px' }}>
               <img
                 src="/images/cadagnolo.png"
                 alt="Nonna Cadagnolo"
                 className="rounded-2xl shadow-2xl w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
-                style={{ maxHeight: "500px" }}
+                style={{ aspectRatio: '1/1', objectFit: 'cover' }}
               />
             </div>
           </div>
 
           <div
-            className={`space-y-6 transition-all duration-1000 delay-300 ${
+            className={`transition-all duration-1000 delay-300 ${
               isVisible
                 ? "opacity-100 translate-x-0"
                 : "opacity-0 translate-x-10"
             }`}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
           >
             <p className="text-rose-900 text-xl leading-relaxed">
               Cadagnolo's Kitchen began in a tiny Italian village where our
@@ -67,9 +72,9 @@ export default function About() {
               the same love, care, and timeless Italian technique that has been
               passed down through our family for generations.
             </p>
-            <div className="pt-4">
+            <div style={{ paddingTop: '1.5rem' }}>
               <div className="inline-block bg-rose-100 text-rose-900 px-6 py-3 rounded-full font-medium">
-                ✨ Handcrafted with Love Since 1950
+                Handcrafted with Love Since 1950
               </div>
             </div>
           </div>
@@ -80,12 +85,12 @@ export default function About() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          <div className="w-full max-w-5xl mx-auto">
+          <div className="w-full mx-auto" style={{ maxWidth: '800px' }}>
             <img
               src="/images/chefs.jpg"
               alt="Chefs Baking"
               className="rounded-2xl shadow-2xl w-full h-auto object-cover hover:scale-[1.02] transition-transform duration-500"
-              style={{ maxHeight: "600px" }}
+              style={{ aspectRatio: '16/9', objectFit: 'cover' }}
             />
           </div>
         </div>
