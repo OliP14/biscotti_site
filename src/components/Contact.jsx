@@ -25,81 +25,93 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="py-32 px-6 bg-gradient-to-b from-amber-50/50 to-rose-50"
+      className="bg-linear-to-b from-amber-50/50 to-rose-50"
+      style={{ paddingTop: '8rem', paddingBottom: '8rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', display: 'flex', justifyContent: 'center' }}
     >
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-serif text-rose-900 mb-4">Contact Us</h2>
-          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full mb-6"></div>
+      <div style={{ width: '100%', maxWidth: '90%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div 
+          className="text-center" 
+          style={{ marginBottom: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
+        >
+          <h2 className="text-5xl font-serif text-rose-900" style={{ marginBottom: '1rem' }}>
+            Contact Us
+          </h2>
+          <div className="w-24 h-1 bg-rose-900 rounded-full" style={{ marginBottom: '1.5rem' }}></div>
           <p className="text-rose-800 text-xl">
             We'd love to hear from you. Send us a message!
           </p>
         </div>
 
-        <div
-          className="bg-white p-10 rounded-2xl shadow-2xl space-y-6"
-          onSubmit={handleSubmit}
-        >
-          <div>
-            <label className="block text-rose-900 font-medium mb-2">
-              Your Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Maria Rossi"
-              className="w-full p-4 border-2 border-rose-100 rounded-xl focus:border-rose-900 focus:outline-none transition-colors"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-rose-900 font-medium mb-2">
-              Your Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="maria@example.com"
-              className="w-full p-4 border-2 border-rose-100 rounded-xl focus:border-rose-900 focus:outline-none transition-colors"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-rose-900 font-medium mb-2">
-              Your Message
-            </label>
-            <textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              placeholder="Tell us what's on your mind..."
-              rows="5"
-              className="w-full p-4 border-2 border-rose-100 rounded-xl focus:border-rose-900 focus:outline-none transition-colors resize-none"
-              required
-            ></textarea>
-          </div>
-
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="w-full bg-rose-900 text-white p-4 rounded-xl hover:bg-rose-800 transition-all transform hover:scale-[1.02] shadow-lg text-lg font-medium"
+        <div style={{ width: '100%', maxWidth: '800px' }}>
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white rounded-2xl shadow-2xl"
+            style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
           >
-            Send Message
-          </button>
-        </div>
-      </div>
+            <div>
+              <label className="block text-rose-900 font-medium" style={{ marginBottom: '0.5rem' }}>
+                Your Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Maria Rossi"
+                className="w-full border-2 border-rose-100 rounded-xl focus:border-rose-900 focus:outline-none transition-colors"
+                style={{ padding: '1rem' }}
+                required
+              />
+            </div>
 
-      <footer className="text-center mt-20 text-rose-800">
-        <p className="text-sm">
-          © 2024 Cadagnolo's Kitchen. Made with ❤️ in Italy.
-        </p>
-      </footer>
+            <div>
+              <label className="block text-rose-900 font-medium" style={{ marginBottom: '0.5rem' }}>
+                Your Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="maria@example.com"
+                className="w-full border-2 border-rose-100 rounded-xl focus:border-rose-900 focus:outline-none transition-colors"
+                style={{ padding: '1rem' }}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-rose-900 font-medium" style={{ marginBottom: '0.5rem' }}>
+                Your Message
+              </label>
+              <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="Tell us what's on your mind..."
+                rows="5"
+                className="w-full border-2 border-rose-100 rounded-xl focus:border-rose-900 focus:outline-none transition-colors resize-none"
+                style={{ padding: '1rem' }}
+                required
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-rose-900 text-white rounded-xl hover:bg-rose-800 transition-all transform hover:scale-[1.02] shadow-lg text-lg font-medium"
+              style={{ padding: '1rem' }}
+            >
+              Send Message
+            </button>
+          </form>
+        </div>
+
+        <footer className="text-center text-rose-800" style={{ marginTop: '5rem' }}>
+          <p className="text-sm">
+            © 2025 Cadagnolo's Kitchen ~  Made with ❤️ by Nonna
+          </p>
+        </footer>
+      </div>
     </section>
   );
 }
