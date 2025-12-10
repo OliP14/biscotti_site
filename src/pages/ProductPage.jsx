@@ -27,14 +27,18 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50 pt-24 pb-16 px-6 flex items-center justify-center">
+      <div 
+        className="min-h-screen bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50"
+        style={{ paddingTop: '6rem', paddingBottom: '4rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
         <div className="text-center">
-          <h1 className="text-4xl font-serif text-rose-900 mb-4">
+          <h1 className="text-4xl font-serif text-rose-900" style={{ marginBottom: '1rem' }}>
             Product Not Found
           </h1>
           <Link
             to="/"
-            className="text-rose-800 hover:text-rose-900 underline"
+            className="text-rose-800 hover:text-rose-900 transition-colors"
+            style={{ textDecoration: 'underline' }}
           >
             Return to Home
           </Link>
@@ -44,21 +48,28 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-rose-50 to-orange-50 pt-24 pb-16 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div 
+      className="min-h-screen bg-linear-to-br from-amber-50 via-rose-50 to-orange-50"
+      style={{ paddingTop: '6rem', paddingBottom: '4rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', display: 'flex', justifyContent: 'center' }}
+    >
+      <div style={{ width: '100%', maxWidth: '1400px' }}>
+        {/* Cleaner Back Button */}
         <Link
           to="/"
-          className="inline-flex items-center text-rose-800 hover:text-rose-900 mb-8 transition-colors group"
+          className="inline-flex items-center text-rose-800 hover:text-rose-900 transition-all group bg-white rounded-full shadow-md hover:shadow-lg"
+          style={{ padding: '0.75rem 1.5rem', marginBottom: '2rem' }}
         >
-          <span className="mr-2 transform group-hover:-translate-x-1 transition-transform">
+          <span className="transform group-hover:-translate-x-1 transition-transform" style={{ marginRight: '0.5rem' }}>
             ←
           </span>
-          Back to Home
+          <span className="font-medium">Back to Home</span>
         </Link>
 
+        {/* Product Card */}
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-0">
-            <div className="relative aspect-square max-h-[600px]">
+            {/* Product Image */}
+            <div className="relative" style={{ aspectRatio: '1/1', maxHeight: '600px' }}>
               <img
                 src={product.img}
                 alt={product.name}
@@ -66,28 +77,32 @@ export default function ProductPage() {
               />
             </div>
 
-            <div className="p-12 flex flex-col justify-center">
-              <h1 className="text-5xl font-serif text-rose-900 mb-6">
+            {/* Product Details */}
+            <div style={{ padding: '3rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <h1 className="text-5xl font-serif text-rose-900" style={{ marginBottom: '1.5rem' }}>
                 {product.name}
               </h1>
 
-              <p className="text-rose-800 text-lg leading-relaxed mb-8">
+              <p className="text-rose-800 text-lg leading-relaxed" style={{ marginBottom: '2rem' }}>
                 {product.desc}
               </p>
 
-              <div className="flex items-center justify-between mb-8">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
                 <p className="text-4xl font-bold text-rose-900">
                   {product.price}
                 </p>
                 <div className="text-rose-700 text-sm">per piece</div>
               </div>
 
-              <button className="bg-rose-900 text-white py-4 px-8 rounded-xl hover:bg-rose-800 transition-all transform hover:scale-[1.02] shadow-lg text-lg font-medium">
+              <button 
+                className="bg-rose-900 text-white rounded-xl hover:bg-rose-800 transition-all transform hover:scale-[1.02] shadow-lg text-lg font-medium"
+                style={{ padding: '1rem 2rem', width: '100%' }}
+              >
                 Order Now
               </button>
 
-              <div className="mt-8 pt-8 border-t border-rose-100">
-                <div className="flex items-center gap-4 text-rose-700">
+              <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #ffe4e6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#9f1239', flexWrap: 'wrap', justifyContent: 'center' }}>
                   <span>✨ Handcrafted</span>
                   <span>•</span>
                   <span>🇮🇹 Italian Recipe</span>
