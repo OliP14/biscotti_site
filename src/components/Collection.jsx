@@ -26,20 +26,20 @@ export default function Collection() {
   }, []);
 
   return (
-    <section id="collection" className="py-32 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl font-serif text-rose-900 mb-4">
+    <section id="collection" className="bg-white" style={{ paddingTop: '8rem', paddingBottom: '8rem', paddingLeft: '1.5rem', paddingRight: '1.5rem', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '90%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="text-center" style={{ marginBottom: '5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <h2 className="text-5xl font-serif text-rose-900" style={{ marginBottom: '1rem' }}>
             Biscotti Collection
           </h2>
-          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full mb-6"></div>
-          <p className="text-rose-800 text-xl max-w-2xl mx-auto">
+          <div className="w-24 h-1 bg-rose-900 mx-auto rounded-full" style={{ marginBottom: '1.5rem' }}></div>
+          <p className="text-rose-800 text-xl" style={{ maxWidth: '48rem' }}>
             Each variety crafted with authentic Italian tradition and the finest
             ingredients
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3" style={{ gap: '2.5rem', width: '100%', maxWidth: '1200px' }}>
           {products.map((product, index) => (
             <Link
               to={`/product/${product.id}`}
@@ -74,8 +74,8 @@ export default function Collection() {
                   ></div>
                 </div>
 
-                <div className="p-6 text-center">
-                  <h3 className="text-2xl text-rose-900 font-serif font-semibold mb-2">
+                <div style={{ padding: '1.5rem', textAlign: 'center' }}>
+                  <h3 className="text-2xl text-rose-900 font-serif font-semibold" style={{ marginBottom: '0.5rem' }}>
                     {product.name}
                   </h3>
                   <div
