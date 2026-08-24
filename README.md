@@ -20,7 +20,7 @@ If you are developing a production application, we recommend using TypeScript wi
 
 This update adds a branded wholesale entry point to the existing React/Vite site.
 
-# New files
+## New files
 
 src/pages/Wholesale.jsx — public wholesale landing/login page at /wholesale
 
@@ -28,7 +28,7 @@ src/config/wholesale.js — central Orderspace portal URL configuration
 
 .env.example — example environment variable for the Orderspace destination
 
-# Modified files
+## Modified files
 
 src/components/Navbar.jsx — adds Wholesale and Wholesale Login
 
@@ -54,10 +54,10 @@ VITE_WHOLESALE_PORTAL_URL=https://wholesale.cadagnolo.com
 
 For Vite, restart the dev server after changing .env values.
 
-# Suggested DNS setup for production
+## Suggested DNS setup for production
 
 Keep the public site at cadagnolo.com and configure wholesale.cadagnolo.com according to the custom-domain DNS instructions Orderspace provides for your account.
 
-# Wholesale email
+## Wholesale email
 
 The new page currently uses wholesale@cadagnolo.com for wholesale inquiries. Change that address in Wholesale.jsx if you plan to use a different inbox.
