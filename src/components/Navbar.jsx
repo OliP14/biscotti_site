@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { WHOLESALE_PORTAL_URL } from "../config/wholesale";
+// import { WHOLESALE_PORTAL_URL } from "../config/wholesale";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -59,13 +59,13 @@ export default function Navbar() {
             <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
           </button>
 
-          <Link
+          {/* <Link
             to="/wholesale"
             className="nav-link hover:text-rose-900 transition-colors relative py-2 whitespace-nowrap"
           >
             Wholesale
             <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
-          </Link>
+          </Link> */}
 
           <button
             onClick={() => scrollToSection("contact")}
@@ -75,15 +75,15 @@ export default function Navbar() {
             <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
           </button>
 
-          <a
-            href={WHOLESALE_PORTAL_URL}
-            className="bg-rose-900 text-white px-5 lg:px-6 py-3 rounded-full hover:bg-rose-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
+          <Link
+            to="/wholesale"
+            className="bg-rose-900 text-white px-3 py-1.5 rounded-full hover:bg-rose-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
           >
             Wholesale Login
-          </a>
+          </Link>
         </div>
 
-        <div className="md:hidden flex items-center gap-3">
+        {/* <div className="md:hidden flex items-center gap-3">
           <Link
             to="/wholesale"
             className="text-rose-900 font-medium text-sm whitespace-nowrap"
@@ -97,7 +97,7 @@ export default function Navbar() {
           >
             Login
           </a>
-        </div>
+        </div> */}
       </div>
     </nav>
   );
