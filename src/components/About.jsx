@@ -63,18 +63,31 @@ export default function About() {
             style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
           >
             <p className="text-rose-900 text-xl leading-relaxed">
-              Cadagnolo's Kitchen began in a tiny Italian village where our
-              Nonna perfected her biscotti recipe using simple, wholesome
-              ingredients.
+              Nestled in the quiet Apennine mountains of northern Italy lies the small town
+              of Cadagnolo. It's the kind of place where mornings start slow, neighbors greet
+              each other by name, and conversations are never rushed.
+
+              At the entrance of the town stands a simple sign marked with a violin--a symbol
+              that has become part of Cadagnolo's identity. The violin represents the people who
+              live there: storytellers at heart, known for speaking passionately, lingering in
+              conversation, and letting words flow as freely as music. In many ways, the violin
+              isn't just about talking--it's about connection. Just like music, conversation
+              brings people together. It fills the sapce between meals, stretches time at the table,
+              and turns simple gatherings into lasting memories.
             </p>
             <p className="text-rose-800 text-lg leading-relaxed">
-              Today, we continue her tradition by handcrafting every batch with
-              the same love, care, and timeless Italian technique that has been
-              passed down through our family for generations.
+              At Cadagnolo's Kitchen, we carry that spirit with us. We believe food should do more
+              than nourish--it should invite people to slow down, to gather, and to stay a little longer.
+              A biscotti shared over coffee isn't just a treat; it's an excuse to talk, to listen, and to
+              enjoy the company around you.
+
+              Our mission is simple: to create food that brings people together while preserving recipes
+              that have been alive for generations, just like in Cadagnolo. Because the best moments
+              in life aren't rushed--they're savored, one bite and one conversation at a time.
             </p>
             <div style={{ paddingTop: '1.5rem' }}>
               <div className="inline-block bg-rose-100 text-rose-900 px-6 py-3 rounded-full font-medium">
-                Handcrafted with Love Since 1950
+                Handcrafted with Love Since 2025
               </div>
             </div>
           </div>

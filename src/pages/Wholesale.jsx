@@ -85,45 +85,6 @@ export default function Wholesale() {
               managed through our Orderspace portal.
             </p>
           </div>
-
-          {/* <aside className="bg-white rounded-3xl shadow-2xl border border-rose-100 overflow-hidden">
-            <div className="bg-rose-900 text-white px-8 py-7">
-              <p className="text-sm font-semibold tracking-[0.18em] uppercase text-rose-100 mb-2">
-                Existing Wholesale Customer
-              </p>
-
-              <h2 className="font-serif text-3xl md:text-4xl">
-                Welcome back.
-              </h2>
-            </div>
-
-            <div className="p-8 md:p-10">
-              <p className="text-rose-800 text-lg leading-relaxed mb-8">
-                Continue to the Cadagnolo's Kitchen wholesale portal to place an
-                order and access your wholesale account.
-              </p>
-
-              <a
-                href={WHOLESALE_PORTAL_URL}
-                className="w-full inline-flex items-center justify-center bg-rose-900 text-white rounded-xl px-6 py-4 text-lg font-semibold shadow-lg hover:bg-rose-800 transition-all"
-              >
-                Continue to Orderspace
-              </a>
-
-              <div className="mt-7 pt-7 border-t border-rose-100">
-                <p className="text-sm text-rose-700 leading-relaxed mb-4">
-                  New to Cadagnolo's Kitchen wholesale?
-                </p>
-
-                <a
-                  href={WHOLESALE_SIGNUP_URL}
-                  className="inline-flex items-center font-semibold text-rose-900 underline underline-offset-4 hover:text-rose-700 transition-colors"
-                >
-                  Register for a wholesale account →
-                </a>
-              </div>
-            </div>
-          </aside> */}
         </div>
       </section>
 
