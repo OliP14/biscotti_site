@@ -24,63 +24,43 @@ const wholesaleBenefits = [
 
 export default function Wholesale() {
   return (
-    <main className="min-h-screen bg-linear-to-br from-amber-50 via-rose-50 to-orange-50 text-rose-900">
-      <header className="w-full px-6 md:px-12 lg:px-20 xl:px-32 py-6 flex items-center justify-between gap-6 bg-white/90 backdrop-blur-md border-b border-rose-100">
-        <Link
-          to="/"
-          className="font-serif text-2xl md:text-3xl text-rose-900 hover:text-rose-700 transition-colors"
-        >
-          Cadagnolo's Kitchen
-        </Link>
-
-        <Link
-          to="/"
-          className="text-sm md:text-base font-medium text-rose-800 hover:text-rose-900 transition-colors whitespace-nowrap"
-        >
-          ← Back to Main Site
-        </Link>
+    <main className="wholesale-page">
+      <header className="subpage-header">
+        <div className="subpage-header-shell">
+          <Link to="/" className="subpage-brand">Cadagnolo's Kitchen</Link>
+          <Link to="/" className="subpage-back">← Back to Main Site</Link>
+        </div>
       </header>
 
-      <section className="px-6 py-20 md:py-28 flex justify-center">
-        <div className="w-full max-w-4xl mx-auto text-center">
-          <div>
-            <div className="inline-flex items-center rounded-full bg-white border border-rose-100 px-4 py-2 text-sm font-semibold tracking-wide text-rose-800 shadow-sm mb-6">
-              WHOLESALE PARTNERS
-            </div>
+      <section className="wholesale-hero">
+        <div className="wholesale-hero-art" aria-hidden="true">
+          <img src="/images/cadagnolo-watercolor-building.png" alt="" />
+        </div>
 
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] text-rose-900 mb-6">
+        <div className="section-shell">
+          <div className="wholesale-hero-copy">
+            <p className="brand-eyebrow">Wholesale Partners</p>
+            <h1 className="wholesale-title">
               Biscotti your customers will come back for.
             </h1>
+            <div className="section-rule" />
 
-            <p className="text-lg md:text-xl leading-relaxed text-rose-800 max-w-2xl mx-auto mb-9">
+            <p className="wholesale-lede">
               Cadagnolo's Kitchen partners with coffee shops, specialty stores,
               and independent retailers who want handcrafted Italian biscotti on
               their shelves and counters.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href={WHOLESALE_PORTAL_URL}
-                className="inline-flex items-center justify-center bg-rose-900 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-rose-800 hover:shadow-xl transition-all transform hover:-translate-y-0.5"
-              >
-                Existing Customer Login
-                <span aria-hidden="true" className="ml-2">
-                  →
-                </span>
+            <div className="wholesale-actions">
+              <a href={WHOLESALE_PORTAL_URL} className="primary-button">
+                Existing Customer Login →
               </a>
-
-              <a
-                href={WHOLESALE_SIGNUP_URL}
-                className="inline-flex items-center justify-center bg-white text-rose-900 border-2 border-rose-200 px-8 py-4 rounded-full font-semibold text-lg shadow-sm hover:border-rose-300 hover:shadow-md transition-all transform hover:-translate-y-0.5"
-              >
-                New Customer Registration
-                <span aria-hidden="true" className="ml-2">
-                  →
-                </span>
+              <a href={WHOLESALE_SIGNUP_URL} className="secondary-button">
+                New Customer Registration →
               </a>
             </div>
 
-            <p className="text-sm text-rose-700 mt-5">
+            <p className="wholesale-note">
               Wholesale ordering, registration, and account access are securely
               managed through our Orderspace portal.
             </p>
@@ -88,87 +68,59 @@ export default function Wholesale() {
         </div>
       </section>
 
-      <section className="bg-white px-6 py-20 md:py-24 flex justify-center">
-        <div className="w-full max-w-6xl">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <h2 className="font-serif text-4xl md:text-5xl text-rose-900 mb-4">
-              Built for Wholesale Partners
-            </h2>
-
-            <p className="text-lg text-rose-800 leading-relaxed">
+      <section className="wholesale-benefits">
+        <div className="section-shell">
+          <div className="wholesale-section-header">
+            <p className="brand-eyebrow">Cadagnolo's Kitchen Wholesale</p>
+            <h2 className="section-heading">Built for Wholesale Partners</h2>
+            <div className="section-rule centered" />
+            <p>
               Your wholesale account gives your business a dedicated place to
               order Cadagnolo's Kitchen products and return whenever it's time to
               restock.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="wholesale-benefit-grid">
             {wholesaleBenefits.map((benefit, index) => (
-              <article
-                key={benefit.title}
-                className="rounded-2xl border border-rose-100 bg-linear-to-br from-white to-amber-50/60 p-7 shadow-sm"
-              >
-                <div className="w-11 h-11 rounded-full bg-rose-100 text-rose-900 flex items-center justify-center font-serif text-xl mb-5">
-                  {index + 1}
-                </div>
-
-                <h3 className="font-serif text-2xl text-rose-900 mb-3">
-                  {benefit.title}
-                </h3>
-
-                <p className="text-rose-800 leading-relaxed">
-                  {benefit.description}
-                </p>
+              <article key={benefit.title} className="wholesale-benefit-card">
+                <div className="wholesale-benefit-number">0{index + 1}</div>
+                <h3>{benefit.title}</h3>
+                <p>{benefit.description}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24 flex justify-center">
-        <div className="w-full max-w-5xl bg-rose-900 text-white rounded-3xl px-8 py-12 md:px-14 md:py-14 text-center shadow-2xl">
-          <p className="text-rose-100 font-semibold tracking-[0.16em] uppercase text-sm mb-3">
-            Cadagnolo's Kitchen Wholesale
-          </p>
+      <section className="wholesale-cta-section">
+        <div className="section-shell">
+          <div className="wholesale-cta">
+            <p className="brand-eyebrow">A Taste of Italy</p>
+            <h2>Ready to get started?</h2>
+            <p>
+              Existing partners can sign in to place their next order, while new
+              retailers can register for a Cadagnolo's Kitchen wholesale account.
+            </p>
 
-          <h2 className="font-serif text-4xl md:text-5xl mb-5">
-            Ready to get started?
-          </h2>
+            <div className="wholesale-actions">
+              <a href={WHOLESALE_PORTAL_URL} className="primary-button">
+                Wholesale Account Login
+              </a>
+              <a href={WHOLESALE_SIGNUP_URL} className="secondary-button">
+                Register for Wholesale
+              </a>
+            </div>
 
-          <p className="text-rose-100 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-            Existing partners can sign in to place their next order, while new
-            retailers can register for a Cadagnolo's Kitchen wholesale account.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href={WHOLESALE_PORTAL_URL}
-              className="inline-flex items-center justify-center bg-white text-rose-900 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-rose-50 transition-colors"
-            >
-              Wholesale Account Login
-            </a>
-
-            <a
-              href={WHOLESALE_SIGNUP_URL}
-              className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-rose-900 transition-colors"
-            >
-              Register for Wholesale
-            </a>
+            <p className="wholesale-help">
+              Need help? Contact us at{" "}
+              <a href="mailto:contact@cadagnolo.com">contact@cadagnolo.com</a>
+            </p>
           </div>
-
-          <p className="text-rose-100 text-sm mt-8">
-            Need help? Contact us at{" "}
-            <a
-              href="mailto:contact@cadagnolo.com"
-              className="font-semibold underline underline-offset-4 hover:text-white"
-            >
-              contact@cadagnolo.com
-            </a>
-          </p>
         </div>
       </section>
 
-      <footer className="text-center text-rose-700 px-6 pb-10 text-sm">
+      <footer className="wholesale-footer">
         © {new Date().getFullYear()} Cadagnolo's Kitchen · cadagnolo.com
       </footer>
     </main>

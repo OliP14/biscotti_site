@@ -1,20 +1,23 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import { WHOLESALE_PORTAL_URL } from "../config/wholesale";
+import ArchedLogo from "./ArchedLogo";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 36);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToSection = (id) => {
+    setMobileOpen(false);
+
     const element = document.getElementById(id);
 
     if (element) {
@@ -22,83 +25,116 @@ export default function Navbar() {
       return;
     }
 
-    // Keeps these links usable if Navbar is later shared with another route.
     navigate(`/#${id}`);
   };
 
   return (
-    <nav
-      className={`border-20 border-white fixed top-0 left-0 w-full z-50 transition-all duration-500 ease-in-out ${
-        scrolled
-          ? "bg-white shadow-lg border-t-10 border-b-10"
-          : "bg-white/95 backdrop-blur-md"
-      }`}
-    >
-      <div className="w-full px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32 flex justify-between items-center gap-4 lg:gap-8">
-        <h1
+    <nav className={`site-navbar ${scrolled ? "scrolled" : ""}`}>
+      <div className="nav-shell">
+        {/* Arched Logo */}
+        <button
+          type="button"
           onClick={() => scrollToSection("hero")}
-          className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-rose-900 cursor-pointer hover:text-rose-700 transition-colors duration-300 whitespace-nowrap"
+          className="nav-brand"
+          aria-label="Cadagnolo's Kitchen home"
+          style={{
+            width: "clamp(150px, 16vw, 210px)",
+            padding: 0,
+            margin: 0,
+            border: "none",
+            background: "transparent",
+            flexShrink: 0,
+            display: "block",
+          }}
         >
-          Cadagnolo's Kitchen
-        </h1>
+          <ArchedLogo
+            width="100%"
+            color="#3f5140"
+            showEst={true}
+          />
+        </button>
 
-        <div className="hidden md:flex items-center gap-5 lg:gap-8 text-rose-800 font-medium text-base lg:text-lg">
+        {/* Desktop Navigation */}
+        <div className="nav-links" aria-label="Primary navigation">
           <button
+            type="button"
             onClick={() => scrollToSection("about")}
-            className="nav-link hover:text-rose-900 transition-colors relative py-2 whitespace-nowrap"
+            className="nav-link"
           >
             Our Story
-            <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
           </button>
 
           <button
+            type="button"
             onClick={() => scrollToSection("collection")}
-            className="nav-link hover:text-rose-900 transition-colors relative py-2 whitespace-nowrap"
+            className="nav-link"
           >
             Biscotti
-            <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
           </button>
-
-          {/* <Link
-            to="/wholesale"
-            className="nav-link hover:text-rose-900 transition-colors relative py-2 whitespace-nowrap"
-          >
-            Wholesale
-            <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
-          </Link> */}
 
           <button
+            type="button"
             onClick={() => scrollToSection("contact")}
-            className="nav-link hover:text-rose-900 transition-colors relative py-2 whitespace-nowrap"
+            className="nav-link"
           >
             Contact
-            <span className="nav-underline absolute bottom-0 left-0 w-0 h-0.5 bg-rose-900"></span>
           </button>
 
-          <Link
-            to="/wholesale"
-            className="bg-rose-900 text-white px-3 py-1.5 rounded-full hover:bg-rose-800 transition-all shadow-md hover:shadow-lg whitespace-nowrap"
-          >
+          <Link to="/wholesale" className="nav-wholesale">
             Wholesale Login
           </Link>
         </div>
 
-        {/* <div className="md:hidden flex items-center gap-3">
+        {/* Mobile Menu Button */}
+        <button
+          type="button"
+          className={`mobile-menu-button ${mobileOpen ? "open" : ""}`}
+          onClick={() => setMobileOpen((current) => !current)}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
+          aria-label={
+            mobileOpen ? "Close navigation menu" : "Open navigation menu"
+          }
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+
+      {/* Mobile Navigation */}
+      {mobileOpen && (
+        <div id="mobile-navigation" className="mobile-nav-panel">
+          <button
+            type="button"
+            onClick={() => scrollToSection("about")}
+          >
+            Our Story
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollToSection("collection")}
+          >
+            Biscotti
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollToSection("contact")}
+          >
+            Contact
+          </button>
+
           <Link
             to="/wholesale"
-            className="text-rose-900 font-medium text-sm whitespace-nowrap"
+            onClick={() => setMobileOpen(false)}
+            className="mobile-wholesale"
           >
-            Wholesale
+            Wholesale Login
           </Link>
-          <a
-            href={WHOLESALE_PORTAL_URL}
-            aria-label="Wholesale account login"
-            className="bg-rose-900 text-white px-4 py-2.5 rounded-full text-sm font-medium shadow-md whitespace-nowrap"
-          >
-            Login
-          </a>
-        </div> */}
-      </div>
+        </div>
+      )}
     </nav>
   );
 }
