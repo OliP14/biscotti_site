@@ -75,7 +75,7 @@ export default function About() {
               brings people together. It fills the sapce between meals, stretches time at the table,
               and turns simple gatherings into lasting memories.
             </p>
-            <p className="text-rose-800 text-lg leading-relaxed">
+            <p className="text-rose-900 text-xl leading-relaxed">
               At Cadagnolo's Kitchen, we carry that spirit with us. We believe food should do more
               than nourish—it should invite people to slow down, to gather, and to stay a little longer.
               A biscotti shared over coffee isn't just a treat; it's an excuse to talk, to listen, and to
@@ -85,11 +85,7 @@ export default function About() {
               that have been alive for generations, just like in Cadagnolo. Because the best moments
               in life aren't rushed—they're savored, one bite and one conversation at a time.
             </p>
-            <div style={{ paddingTop: '1.5rem' }}>
-              <div className="inline-block bg-rose-100 text-rose-900 px-6 py-3 rounded-full font-medium">
-                Handcrafted with Love Since 2025
-              </div>
-            </div>
+            <div style={{ paddingTop: '1.5rem' }}></div>
           </div>
         </div>
 
