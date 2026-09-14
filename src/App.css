@@ -41,7 +41,7 @@ section {
 .brand-eyebrow {
   margin: 0 0 0.85rem;
   color: var(--cadagnolo-green);
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.27em;
   text-transform: uppercase;
@@ -145,6 +145,8 @@ section {
   color: var(--cadagnolo-green-dark);
   text-align: left;
   padding: 0;
+  /* Use this to change top padding of logo */
+  transform: translateY(7px);
 }
 
 .nav-brand-top {
@@ -169,7 +171,7 @@ section {
   align-items: center;
   gap: clamp(1.25rem, 2.5vw, 2.5rem);
   color: var(--cadagnolo-green-dark);
-  font-size: 0.92rem;
+  font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: 0.08em;
 }
@@ -202,7 +204,7 @@ section {
   background: var(--cadagnolo-green-dark);
   color: var(--cadagnolo-white);
   padding: 0.7rem 1rem;
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -314,7 +316,7 @@ section {
   gap: 1rem;
   margin-bottom: 1.65rem;
   color: var(--cadagnolo-green);
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -383,7 +385,7 @@ section {
   bottom: 1.6rem;
   transform: translateX(-50%);
   color: var(--cadagnolo-green);
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
 }
@@ -401,7 +403,7 @@ section {
 /* About */
 .about-section {
   position: relative;
-  padding: 8.5rem 0;
+  padding: 6rem 0;
   background: var(--cadagnolo-white);
 }
 
@@ -409,7 +411,7 @@ section {
   display: grid;
   grid-template-columns: minmax(320px, 0.86fr) minmax(0, 1.14fr);
   gap: clamp(3rem, 7vw, 7rem);
-  align-items: center;
+  align-items: start;
 }
 
 .about-art-wrap {
@@ -497,7 +499,7 @@ section {
 .about-photo-caption {
   padding: 1rem 0 0.35rem;
   color: var(--cadagnolo-muted);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   line-height: 1.7;
 }
 

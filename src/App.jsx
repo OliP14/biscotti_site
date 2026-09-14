@@ -27,7 +27,15 @@ export default function App() {
         />
 
         {/* Product detail page */}
-        <Route path="/product/:id" element={<ProductPage />} />
+        <Route
+          path="/product/:id"
+          element={
+            <>
+              <Navbar />
+              <ProductPage />
+            </>
+          }
+        />
 
         {/* Wholesale landing/login portal */}
         <Route path="/wholesale" element={<Wholesale />} />

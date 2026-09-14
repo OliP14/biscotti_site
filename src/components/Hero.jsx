@@ -56,7 +56,7 @@ export default function Hero() {
             </Link>
           </div>
 
-          <div className="hero-est">Est. 2025</div>
+          {/* <div className="hero-est">Est. 2025</div> */}
         </div>
       </div>
 

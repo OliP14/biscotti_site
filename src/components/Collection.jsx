@@ -55,7 +55,6 @@ export default function Collection() {
               </div>
 
               <div className="product-card-copy">
-                <div className="product-brandline">Cadagnolo's Kitchen</div>
                 <h3>{product.name}</h3>
                 <div className="product-discover">Discover the flavor →</div>
               </div>

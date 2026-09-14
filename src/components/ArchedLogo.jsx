@@ -63,7 +63,7 @@ export default function ArchedLogo({
       </text>
 
       {/* Optional EST 2025 */}
-      {showEst && (
+      {/* {showEst && (
         <text
           x="300"
           y="230"
@@ -75,7 +75,7 @@ export default function ArchedLogo({
         >
           EST 2025
         </text>
-      )}
+      )} */}
     </svg>
   );
 }

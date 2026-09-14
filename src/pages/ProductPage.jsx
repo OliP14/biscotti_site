@@ -32,7 +32,6 @@ function ProductHeader() {
   return (
     <header className="subpage-header">
       <div className="subpage-header-shell">
-        <Link to="/" className="subpage-brand">Cadagnolo's Kitchen</Link>
         <Link to="/#collection" className="subpage-back">← Back to Biscotti</Link>
       </div>
     </header>
@@ -84,7 +83,7 @@ export default function ProductPage() {
 
             <p className="product-detail-description">{product.desc}</p>
 
-            <div className="product-option-field">
+            {/* <div className="product-option-field">
               <label htmlFor="size">Select Size</label>
               <select
                 id="size"
@@ -97,18 +96,18 @@ export default function ProductPage() {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
 
-            <div className="product-price-row">
+            {/* <div className="product-price-row">
               <div className="product-price">{currentOption.price}</div>
               <div className="product-unit">
                 {selectedOption === "single" ? "per piece" : "per 6-pack"}
               </div>
-            </div>
+            </div> */}
 
-            <button type="button" className="primary-button" style={{ width: "100%" }}>
+            {/* <button type="button" className="primary-button" style={{ width: "100%" }}>
               Add to Cart
-            </button>
+            </button> */}
 
             <div className="product-values">
               Handcrafted · Family Recipe · Baked in Small Batches
