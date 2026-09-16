@@ -1287,34 +1287,38 @@ section {
     width: min(100% - 2rem, 1180px);
   }
 
+  /* Give hero title a little more horizontal room */
+  .hero-content {
+    width: calc(100% - 1.5rem);
+    padding-top: 7rem;
+    padding-bottom: 14rem;
+  }
+
   .nav-shell {
     min-height: 72px;
   }
 
-  .nav-brand-top {
-    font-size: 1.12rem;
-  }
-
-  .nav-brand-bottom {
-    font-size: 0.8rem;
-  }
-
   .hero-section {
-    min-height: 820px;
+    min-height: 760px;
   }
 
-  .hero-content {
-    padding-top: 7.8rem;
+  /* Keep full CADAGNOLO'S visible */
+  .hero-title {
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero-title-top {
-    font-size: clamp(3.5rem, 17vw, 5.2rem);
-    letter-spacing: 0.04em;
+    font-size: clamp(2.75rem, 13.5vw, 4.6rem);
+    letter-spacing: 0.015em;
+    white-space: nowrap;
   }
 
   .hero-title-bottom {
-    font-size: clamp(2.75rem, 13vw, 4.2rem);
-    letter-spacing: 0.11em;
+    margin-top: 0.3rem;
+    font-size: clamp(2.4rem, 11vw, 3.8rem);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
   }
 
   .hero-kicker {
@@ -1338,20 +1342,41 @@ section {
     width: 100%;
   }
 
-  .about-section,
+  /* Story comes before painting on mobile */
+  .about-copy {
+    order: 1;
+  }
+
+  .about-art-wrap {
+    order: 2;
+    min-height: 0;
+    height: 260px;
+    margin-top: 1rem;
+  }
+
+  .about-art-wrap img {
+    min-height: 0;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 48%;
+  }
+
+  .about-grid {
+    gap: 2.5rem;
+  }
+
+  .about-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
   .collection-section,
   .contact-section {
     padding-top: 6.25rem;
   }
 
-  .about-section,
   .collection-section {
     padding-bottom: 6.25rem;
-  }
-
-  .about-art-wrap,
-  .about-art-wrap img {
-    min-height: 500px;
   }
 
   .about-photo-row {
@@ -1406,7 +1431,12 @@ section {
   }
 
   .wholesale-hero-art::after {
-    background: linear-gradient(180deg, var(--cadagnolo-cream), rgba(245, 240, 227, 0.58) 38%, transparent);
+    background: linear-gradient(
+      180deg,
+      var(--cadagnolo-cream),
+      rgba(245, 240, 227, 0.58) 38%,
+      transparent
+    );
   }
 
   .wholesale-benefits {
