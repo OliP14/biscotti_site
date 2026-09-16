@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useForm, ValidationError } from "@formspree/react";
+import { Link } from "react-router-dom";
 
 export default function Contact() {
   const formRef = useRef(null);
@@ -96,6 +97,11 @@ export default function Contact() {
       <footer className="site-footer">
         <div className="footer-shell">
           <div className="footer-brand">Cadagnolo's Kitchen · A Taste of Italy</div>
+          <div className="footer-links">
+            <Link to="/nutrition">
+              Nutrition Facts
+            </Link>
+          </div>
           <div className="footer-meta">
             © {new Date().getFullYear()} Cadagnolo's Kitchen · Est. 2025
           </div>

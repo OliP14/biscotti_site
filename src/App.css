@@ -776,6 +776,42 @@ section {
   letter-spacing: 0.09em;
 }
 
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+
+  margin: 0.75rem 0;
+
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  /* text-transform: uppercase; */
+}
+
+.footer-links a,
+.footer-links button {
+  border: 0;
+  background: transparent;
+
+  color: inherit;
+  font: inherit;
+
+  padding: 0;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition: opacity 200ms ease;
+}
+
+.footer-links a:hover,
+.footer-links button:hover {
+  opacity: 0.65;
+}
+
 /* Product page */
 .product-page,
 .wholesale-page {
@@ -1380,4 +1416,87 @@ section {
   .wholesale-cta-section {
     padding: 4rem 0;
   }
+}
+
+/* Ingredients Dropdown */
+
+.ingredients-dropdown {
+  width: 100%;
+  margin-top: 1rem;
+  border-top: 1px solid var(--cadagnolo-line);
+  border-bottom: 1px solid var(--cadagnolo-line);
+}
+
+.ingredients-summary {
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 1.15rem 0;
+
+  color: var(--cadagnolo-green-dark);
+
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.ingredients-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ingredients-summary::marker {
+  content: "";
+}
+
+.ingredients-summary::after {
+  content: "+";
+  font-family: Arial, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 300;
+}
+
+.ingredients-dropdown[open] .ingredients-summary::after {
+  content: "−";
+}
+
+.ingredients-content {
+  padding: 0 0 1.5rem;
+}
+
+.ingredients-label {
+  margin-bottom: 0.45rem;
+
+  color: var(--cadagnolo-green-dark);
+
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ingredients-text {
+  margin-bottom: 1.25rem;
+
+  color: var(--cadagnolo-ink);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.nutrition-page-link {
+  display: inline-block;
+
+  color: var(--cadagnolo-green-dark);
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }

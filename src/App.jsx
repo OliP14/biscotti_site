@@ -6,6 +6,7 @@ import Collection from "./components/Collection";
 import Contact from "./components/Contact";
 import ProductPage from "./pages/ProductPage";
 import Wholesale from "./pages/Wholesale";
+import NutritionFacts from "./pages/NutritionFacts";
 import "./App.css";
 
 export default function App() {
@@ -33,6 +34,17 @@ export default function App() {
             <>
               <Navbar />
               <ProductPage />
+            </>
+          }
+        />
+
+        {/* Nutrition facts page */}
+        <Route
+          path="/nutrition"
+          element={
+            <>
+              <Navbar />
+              <NutritionFacts />
             </>
           }
         />
