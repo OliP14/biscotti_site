@@ -49,7 +49,7 @@ export default function About() {
 
             <div className="about-body">
               <p>
-                Nestled in the quiet Apennine mountains of northern Italy lies the small town
+                Nestled in the quiet Apennine Mountains of northern Italy lies the small town
                 of Cadagnolo. It's the kind of place where mornings start slow, neighbors greet
                 each other by name, and conversations are never rushed.
               </p>
