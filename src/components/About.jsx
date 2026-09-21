@@ -49,13 +49,13 @@ export default function About() {
 
             <div className="about-body">
               <p>
-                Nestled in the quiet Apennine Mountains of northern Italy lies the small town
+                Nestled in the quiet Apennine Mountains of northern Italy lies the small hamlet
                 of Cadagnolo. It's the kind of place where mornings start slow, neighbors greet
                 each other by name, and conversations are never rushed.
               </p>
 
               <p>
-                At the entrance of the town stands a simple sign marked with a violin—a symbol
+                At the entrance of the hamlet stands a simple sign marked with a violin—a symbol
                 that has become part of Cadagnolo's identity. The violin represents the people who
                 live there: storytellers at heart, known for speaking passionately, lingering in
                 conversation, and letting words flow as freely as music. In many ways, the violin
