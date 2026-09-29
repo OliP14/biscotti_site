@@ -1165,6 +1165,185 @@ section {
   text-align: center;
 }
 
+/* Wholesale Application */
+
+.wholesale-application-section {
+  padding: 6rem 1.5rem 7rem;
+}
+
+.wholesale-application-shell {
+  width: min(850px, 100%);
+  margin: 0 auto;
+}
+
+.wholesale-application-heading {
+  max-width: 680px;
+  margin: 0 auto 3.5rem;
+  text-align: center;
+}
+
+.wholesale-application-heading h1,
+.wholesale-application-success h1 {
+  margin: 0;
+  color: var(--cadagnolo-green-dark);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(3.2rem, 7vw, 5.4rem);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.wholesale-application-heading > p:last-child,
+.wholesale-application-success > p {
+  margin: 1.5rem auto 0;
+  color: var(--cadagnolo-brown);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.wholesale-application-form {
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--cadagnolo-line);
+  background: var(--cadagnolo-white);
+  box-shadow: 0 24px 60px rgba(72, 69, 53, 0.08);
+}
+
+.wholesale-application-form fieldset {
+  margin: 0 0 3rem;
+  padding: 0;
+  border: 0;
+}
+
+.wholesale-application-form legend {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--cadagnolo-line);
+  color: var(--cadagnolo-green-dark);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.wholesale-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.3rem;
+}
+
+.wholesale-form-field.full {
+  grid-column: 1 / -1;
+}
+
+.wholesale-form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--cadagnolo-green-dark);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.wholesale-form-field .optional {
+  color: var(--cadagnolo-muted);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.wholesale-form-field input,
+.wholesale-form-field select {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(86, 106, 83, 0.3);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--cadagnolo-ink);
+  font: inherit;
+  outline: none;
+}
+
+.wholesale-form-field input:focus,
+.wholesale-form-field select:focus {
+  border-color: var(--cadagnolo-green-dark);
+  box-shadow: 0 0 0 2px rgba(63, 81, 64, 0.1);
+}
+
+.wholesale-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  color: var(--cadagnolo-brown);
+  cursor: pointer;
+}
+
+.wholesale-checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cadagnolo-green-dark);
+}
+
+.wholesale-form-error {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid #a94442;
+  background: #fff4f4;
+  color: #8a2927;
+}
+
+.wholesale-submit {
+  width: 100%;
+  border: 0;
+}
+
+.wholesale-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.wholesale-form-disclaimer {
+  margin: 1rem auto 0;
+  max-width: 600px;
+  color: var(--cadagnolo-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.wholesale-application-success {
+  width: min(700px, 100%);
+  margin: 3rem auto;
+  padding: clamp(2.5rem, 7vw, 5rem);
+  border: 1px solid var(--cadagnolo-line);
+  background: var(--cadagnolo-white);
+  box-shadow: 0 24px 60px rgba(72, 69, 53, 0.08);
+  text-align: center;
+}
+
+.wholesale-application-success .primary-button {
+  margin-top: 2rem;
+}
+
+@media (max-width: 680px) {
+  .wholesale-application-section {
+    padding: 4rem 1rem 5rem;
+  }
+
+  .wholesale-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wholesale-form-field.full {
+    grid-column: auto;
+  }
+
+  .wholesale-application-form {
+    padding: 1.5rem;
+  }
+}
+
 /* Responsive */
 @media (max-width: 960px) {
   .nav-links {

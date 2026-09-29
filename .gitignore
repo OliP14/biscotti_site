@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Secrets
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+!.env.example

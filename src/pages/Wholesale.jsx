@@ -13,12 +13,12 @@ const wholesaleBenefits = [
   {
     title: "Easy Reordering",
     description:
-      "Sign in to your wholesale account to place orders and keep your favorite Cadagnolo's biscotti in stock.",
+      "Approved wholesale partners can sign in to place orders and keep their favorite Cadagnolo's biscotti in stock.",
   },
   {
     title: "Your Account in One Place",
     description:
-      "Use the Orderspace portal to manage wholesale orders and view the account information available to your business.",
+      "Use your Cadagnolo's Kitchen wholesale account to manage orders and your business purchasing.",
   },
 ];
 
@@ -27,42 +27,61 @@ export default function Wholesale() {
     <main className="wholesale-page">
       <header className="subpage-header">
         <div className="subpage-header-shell">
-          <Link to="/" className="subpage-brand">Cadagnolo's Kitchen</Link>
-          <Link to="/" className="subpage-back">← Back to Main Site</Link>
+          <Link to="/" className="subpage-brand">
+            Cadagnolo's Kitchen
+          </Link>
+
+          <Link to="/" className="subpage-back">
+            ← Back to Main Site
+          </Link>
         </div>
       </header>
 
       <section className="wholesale-hero">
         <div className="wholesale-hero-art" aria-hidden="true">
-          <img src="/images/cadagnolo-watercolor-building.png" alt="" />
+          <img
+            src="/images/cadagnolo-watercolor-building.png"
+            alt=""
+          />
         </div>
 
         <div className="section-shell">
           <div className="wholesale-hero-copy">
             <p className="brand-eyebrow">Wholesale Partners</p>
+
             <h1 className="wholesale-title">
               Biscotti your customers will come back for.
             </h1>
+
             <div className="section-rule" />
 
             <p className="wholesale-lede">
-              Cadagnolo's Kitchen partners with coffee shops, specialty stores,
-              and independent retailers who want handcrafted Italian biscotti on
-              their shelves and counters.
+              Cadagnolo's Kitchen partners with coffee shops,
+              specialty stores, and independent retailers who want
+              handcrafted Italian biscotti on their shelves and
+              counters.
             </p>
 
             <div className="wholesale-actions">
-              <a href={WHOLESALE_PORTAL_URL} className="primary-button">
+              <a
+                href={WHOLESALE_PORTAL_URL}
+                className="primary-button"
+              >
                 Existing Customer Login →
               </a>
-              <a href={WHOLESALE_SIGNUP_URL} className="secondary-button">
+
+              <Link
+                to={WHOLESALE_SIGNUP_URL}
+                className="secondary-button"
+              >
                 New Customer Registration →
-              </a>
+              </Link>
             </div>
 
             <p className="wholesale-note">
-              Wholesale ordering, registration, and account access are securely
-              managed through our Orderspace portal.
+              Already an approved wholesale partner? Sign in to your
+              account. New retailers can submit an application for
+              wholesale access.
             </p>
           </div>
         </div>
@@ -71,21 +90,35 @@ export default function Wholesale() {
       <section className="wholesale-benefits">
         <div className="section-shell">
           <div className="wholesale-section-header">
-            <p className="brand-eyebrow">Cadagnolo's Kitchen Wholesale</p>
-            <h2 className="section-heading">Built for Wholesale Partners</h2>
+            <p className="brand-eyebrow">
+              Cadagnolo's Kitchen Wholesale
+            </p>
+
+            <h2 className="section-heading">
+              Built for Wholesale Partners
+            </h2>
+
             <div className="section-rule centered" />
+
             <p>
-              Your wholesale account gives your business a dedicated place to
-              order Cadagnolo's Kitchen products and return whenever it's time to
-              restock.
+              Approved wholesale partners have a dedicated place to
+              order Cadagnolo's Kitchen products whenever it's time
+              to restock.
             </p>
           </div>
 
           <div className="wholesale-benefit-grid">
             {wholesaleBenefits.map((benefit, index) => (
-              <article key={benefit.title} className="wholesale-benefit-card">
-                <div className="wholesale-benefit-number">0{index + 1}</div>
+              <article
+                key={benefit.title}
+                className="wholesale-benefit-card"
+              >
+                <div className="wholesale-benefit-number">
+                  0{index + 1}
+                </div>
+
                 <h3>{benefit.title}</h3>
+
                 <p>{benefit.description}</p>
               </article>
             ))}
@@ -97,31 +130,44 @@ export default function Wholesale() {
         <div className="section-shell">
           <div className="wholesale-cta">
             <p className="brand-eyebrow">A Taste of Italy</p>
+
             <h2>Ready to get started?</h2>
+
             <p>
-              Existing partners can sign in to place their next order, while new
-              retailers can register for a Cadagnolo's Kitchen wholesale account.
+              Existing partners can sign in to place their next
+              order, while new retailers can apply for a
+              Cadagnolo's Kitchen wholesale account.
             </p>
 
             <div className="wholesale-actions">
-              <a href={WHOLESALE_PORTAL_URL} className="primary-button">
+              <a
+                href={WHOLESALE_PORTAL_URL}
+                className="primary-button"
+              >
                 Wholesale Account Login
               </a>
-              <a href={WHOLESALE_SIGNUP_URL} className="secondary-button">
-                Register for Wholesale
-              </a>
+
+              <Link
+                to={WHOLESALE_SIGNUP_URL}
+                className="secondary-button"
+              >
+                Apply for Wholesale
+              </Link>
             </div>
 
             <p className="wholesale-help">
               Need help? Contact us at{" "}
-              <a href="mailto:contact@cadagnolo.com">contact@cadagnolo.com</a>
+              <a href="mailto:contact@cadagnolo.com">
+                contact@cadagnolo.com
+              </a>
             </p>
           </div>
         </div>
       </section>
 
       <footer className="wholesale-footer">
-        © {new Date().getFullYear()} Cadagnolo's Kitchen · cadagnolo.com
+        © {new Date().getFullYear()} Cadagnolo's Kitchen ·
+        cadagnolo.com
       </footer>
     </main>
   );
