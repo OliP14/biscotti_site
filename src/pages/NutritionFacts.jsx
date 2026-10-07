@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 const nutritionProducts = [
   {
     id: "cranberry-chocolate",
-    name: "Cranberry Chocolate",
+    name: "Dark Chocolate Cranberry Biscotti",
     pdf: "/nutrition/cranberry-chocolate-nutrition.pdf",
   },
   {
     id: "cranberry",
-    name: "Cranberry",
+    name: "Cranberry Biscotti",
     pdf: "/nutrition/cranberry-nutrition.pdf",
   },
   {
     id: "anise",
-    name: "Anise",
+    name: "Anise Biscotti",
     pdf: "/nutrition/anise-nutrition.pdf",
   },
 ];
