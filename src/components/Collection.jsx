@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const products = [
   { id: 1, name: "Dark Chocolate Cranberry", img: "/images/chocolate_cran.jpg" },
-  { id: 2, name: "Cranberry", img: "/images/cranberry.jpg" },
+  { id: 2, name: "Cranberry", img: "/images/cranberry_stacked.png" },
   { id: 3, name: "Anise", img: "/images/anise.jpg" },
 ];
 

@@ -20,7 +20,7 @@ const productData = {
       "Unbleached flour (unbleached hard red wheat flour, enzyme), sugar, eggs, butter (pasteurized cream, salt), dried cranberries (cranberries, sugar), olive oil. Contains: 2% or less of: baking powder (baking soda, cornstarch, sodium aluminum sulfate, calcium sulfate, monocalcium phosphate), anise seed, baking soda, salt, vanilla extract (vanilla bean extractives in water, alcohol). \nCONTAINS: WHEAT, MILK, EGG.",
     nutritionId: "cranberry",
     options: [
-      { value: "single", label: "Single Biscotti", price: "$2.49", img: "/images/cranberry.jpg" },
+      { value: "single", label: "Single Biscotti", price: "$2.49", img: "/images/cranberry_stacked.png" },
       { value: "bag", label: "Bag", price: "$12.99", img: "/images/cranberry_pack.jpg" },
     ],
   },
