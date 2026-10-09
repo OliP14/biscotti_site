@@ -3,37 +3,37 @@ import { Link, useParams } from "react-router-dom";
 
 const productData = {
   1: {
-    name: "Cranberry Chocolate",
+    name: "Dark Chocolate Cranberry",
     desc: "A perfect balance of tart and indulgent, our Chocolate-Covered Cranberry Biscotti begins with a crisp base generously studded with dried cranberries. Each cookie is then hand-dipped in velvety dark chocolate, adding a luxurious richness that melts into the bright cranberry sweetness. It's a harmonious blend of bold and fruity--an irresistible treat for anyone who loves a little extra decadence with their biscotti.",
     ingredients:
-      "Bleached wheat flour (wheat flour, malted barley flour, niacin, iron, thiamin mononitrate, riboflavin, folic acid), dark chocolate flavored coating (cane sugar, vegetable oil [palm kernel oil, palm oil, glyceryl lacto esters], nonfat dry milk, cocoa processed with alkali, cocoa, soy lecithin, salt), sugar, eggs, butter (pasteurized cream, salt), dried cranberries (cranberries, sugar), olive oil. Contains: 2% or less of: baking powder (baking soda, cornstarch, sodium aluminum sulfate, calcium sulfate, monocalcium phosphate), anise seed, baking soda, salt, vanilla extract (vanilla bean extractives in water, alcohol). \nCONTAINS: WHEAT, MILK, EGG, SOY.",
+      "Unbleached flour (unbleached hard red wheat flour, enzyme), dark chocolate flavored coating (cane sugar, vegetable oil [palm kernel oil, palm oil, glyceryl lacto esters], nonfat dry milk, cocoa processed with alkali, cocoa, soy lecithin, salt), sugar, eggs, butter (pasteurized cream, salt), dried cranberries (cranberries, sugar), olive oil. Contains: 2% or less of: baking powder (baking soda, cornstarch, sodium aluminum sulfate, calcium sulfate, monocalcium phosphate), anise seed, baking soda, salt, vanilla extract (vanilla bean extractives in water, alcohol). \nCONTAINS: WHEAT, MILK, EGG, SOY.",
     nutritionId: "cranberry-chocolate",
     options: [
       { value: "single", label: "Single Biscotti", price: "$2.99", img: "/images/chocolate_cran.jpg" },
-      { value: "pack", label: "6-Pack", price: "$14.99", img: "/images/chocolate_cran_pack.jpg" },
+      { value: "bag", label: "Bag", price: "$14.99", img: "/images/chocolate_cran_pack.jpg" },
     ],
   },
   2: {
     name: "Cranberry",
     desc: "Light, bright, and delightfully festive, our Cranberry Biscotti highlights the natural sweetness and gentle tartness of real dried cranberries. Baked to a golden crunch using our traditional family recipe, this biscotti is flavorful without being overly sweet--perfect for dipping into a morning cappuccino or enjoying as an afternoon pick-me-up. A simple, elegant flavor that tastes like home.",
     ingredients: 
-      "Bleached wheat flour (wheat flour, malted barley flour, niacin, iron, thiamin mononitrate, riboflavin, folic acid), sugar, eggs, butter (pasteurized cream, salt), dried cranberries (cranberries, sugar), olive oil. Contains: 2% or less of: baking powder (baking soda, cornstarch, sodium aluminum sulfate, calcium sulfate, monocalcium phosphate), anise seed, baking soda, salt, vanilla extract (vanilla bean extractives in water, alcohol). \nCONTAINS: WHEAT, MILK, EGG.",
+      "Unbleached flour (unbleached hard red wheat flour, enzyme), sugar, eggs, butter (pasteurized cream, salt), dried cranberries (cranberries, sugar), olive oil. Contains: 2% or less of: baking powder (baking soda, cornstarch, sodium aluminum sulfate, calcium sulfate, monocalcium phosphate), anise seed, baking soda, salt, vanilla extract (vanilla bean extractives in water, alcohol). \nCONTAINS: WHEAT, MILK, EGG.",
     nutritionId: "cranberry",
     options: [
       { value: "single", label: "Single Biscotti", price: "$2.49", img: "/images/cranberry.jpg" },
-      { value: "pack", label: "6-Pack", price: "$12.99", img: "/images/cranberry_pack.jpg" },
+      { value: "bag", label: "Bag", price: "$12.99", img: "/images/cranberry_pack.jpg" },
     ],
   },
-  3: {
-    name: "Anise",
-    desc: "A classic Italian favorite, our Anise Biscotti is delicately scented with the warm aromatic notes of anise seed. Each bite offers a subtle licorice sweetness and the comforting crunch of authentic, old-world biscotti. This timeless recipe has been passed down for generations and remains a beloved staple--perfect alongside espresso, wine, or enjoyed all on its own.",
-    ingredients: "",
-    nutritionId: "anise",
-    options: [
-      { value: "single", label: "Single Biscotti", price: "$2.49", img: "/images/anise.jpg" },
-      { value: "pack", label: "6-Pack", price: "$12.99", img: "/images/anise_pack.jpg" },
-    ],
-  },
+  // 3: {
+  //   name: "Anise",
+  //   desc: "A classic Italian favorite, our Anise Biscotti is delicately scented with the warm aromatic notes of anise seed. Each bite offers a subtle licorice sweetness and the comforting crunch of authentic, old-world biscotti. This timeless recipe has been passed down for generations and remains a beloved staple--perfect alongside espresso, wine, or enjoyed all on its own.",
+  //   ingredients: "",
+  //   nutritionId: "anise",
+  //   options: [
+  //     { value: "single", label: "Single Biscotti", price: "$2.49", img: "/images/anise.jpg" },
+  //     { value: "bag", label: "Bag", price: "$12.99", img: "/images/anise_pack.jpg" },
+  //   ],
+  // },
 };
 
 function ProductHeader() {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const products = [
-  { id: 1, name: "Cranberry Chocolate", img: "/images/chocolate_cran.jpg" },
+  { id: 1, name: "Dark Chocolate Cranberry", img: "/images/chocolate_cran.jpg" },
   { id: 2, name: "Cranberry", img: "/images/cranberry.jpg" },
   { id: 3, name: "Anise", img: "/images/anise.jpg" },
 ];
