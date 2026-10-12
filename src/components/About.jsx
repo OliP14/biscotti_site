@@ -82,7 +82,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className="about-photo-row">
+        {/* <div className="about-photo-row">
           <div>
             <div className="about-family-photo">
               <img src="/images/chefs.jpg" alt="Chefs baking together" />
@@ -95,7 +95,7 @@ export default function About() {
           <div className="about-pullquote">
             “Food should invite people to slow down, to gather, and to stay a little longer.”
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

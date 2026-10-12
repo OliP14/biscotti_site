@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const products = [
-  { id: 1, name: "Dark Chocolate Cranberry", img: "/images/chocolate_cran.jpg" },
-  { id: 2, name: "Cranberry", img: "/images/cranberry_stacked.png" },
+  { id: 1, name: "Dark Chocolate Cranberry", img: "/images/chocolate_stacked_background.png" },
+  { id: 2, name: "Cranberry", img: "/images/cranberry_stacked_background.png" },
   { id: 3, name: "Anise", img: "/images/anise.jpg" },
 ];
 

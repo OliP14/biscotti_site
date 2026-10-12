@@ -9,7 +9,7 @@ const productData = {
       "Unbleached flour (unbleached hard red wheat flour, enzyme), dark chocolate flavored coating (cane sugar, vegetable oil [palm kernel oil, palm oil, glyceryl lacto esters], nonfat dry milk, cocoa processed with alkali, cocoa, soy lecithin, salt), sugar, eggs, butter (pasteurized cream, salt), dried cranberries (cranberries, sugar), olive oil. Contains: 2% or less of: baking powder (baking soda, cornstarch, sodium aluminum sulfate, calcium sulfate, monocalcium phosphate), anise seed, baking soda, salt, vanilla extract (vanilla bean extractives in water, alcohol). \nCONTAINS: WHEAT, MILK, EGG, SOY.",
     nutritionId: "cranberry-chocolate",
     options: [
-      { value: "single", label: "Single Biscotti", price: "$2.99", img: "/images/chocolate_cran.jpg" },
+      { value: "single", label: "Single Biscotti", price: "$2.99", img: "/images/chocolate_stacked.png" },
       { value: "bag", label: "Bag", price: "$14.99", img: "/images/chocolate_cran_pack.jpg" },
     ],
   },
