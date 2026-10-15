@@ -56,9 +56,6 @@ export default function Collection() {
                     <span className="coming-soon-card-script">
                       Made with love
                     </span>
-                    <span className="coming-soon-card-caption">
-                      Always in the making
-                    </span>
                   </div>
                 ) : (
                   <img src={product.img} alt={product.name} />
