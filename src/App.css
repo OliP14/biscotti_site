@@ -1709,3 +1709,91 @@ section {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+
+
+/* More Flavors Coming Soon Card */
+
+.coming-soon-card-art {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(255, 253, 248, 0.85),
+      transparent 68%
+    ),
+    linear-gradient(145deg, #e9e4d4, #d7dfcf);
+  color: var(--cadagnolo-green-dark);
+  text-align: center;
+}
+
+.coming-soon-card-ornament {
+  margin-bottom: 1.5rem;
+  color: var(--cadagnolo-sage);
+  font-size: 2.2rem;
+}
+
+.coming-soon-card-script {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2rem, 3.2vw, 3.2rem);
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.coming-soon-card-caption {
+  margin-top: 1.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Coming Soon Story Page */
+
+.coming-soon-page {
+  min-height: 75vh;
+  padding: clamp(4rem, 8vw, 8rem) 1.25rem;
+  background: linear-gradient(
+    150deg,
+    var(--cadagnolo-cream),
+    var(--cadagnolo-paper)
+  );
+}
+
+.coming-soon-story {
+  max-width: 810px;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vw, 5rem);
+  text-align: center;
+}
+
+.coming-soon-story .section-heading {
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+}
+
+.coming-soon-story-body {
+  max-width: 625px;
+  margin: 2.2rem auto 2.5rem;
+  color: var(--cadagnolo-brown);
+  font-size: 1.08rem;
+  line-height: 1.9;
+}
+
+.coming-soon-story-body p + p {
+  margin-top: 1.3rem;
+}
+
+@media (max-width: 680px) {
+  .coming-soon-page {
+    padding: 3rem 1rem 5rem;
+  }
+
+  .coming-soon-story-body {
+    font-size: 1rem;
+  }
+}

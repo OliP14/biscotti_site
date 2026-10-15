@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const products = [
   { id: 1, name: "Dark Chocolate Cranberry", img: "/images/chocolate_stacked_background.png" },
   { id: 2, name: "Cranberry", img: "/images/cranberry_stacked_background.png" },
-  { id: 3, name: "Anise", img: "/images/anise.jpg" },
+  { id: 3, name: "More Flavors Coming Soon", comingSoon: true },
 ];
 
 export default function Collection() {
@@ -41,7 +41,7 @@ export default function Collection() {
         <div className="product-grid">
           {products.map((product, index) => (
             <Link
-              to={`/product/${product.id}`}
+              to={product.comingSoon ? "/coming-soon" : `/product/${product.id}`}
               key={product.id}
               className="product-card"
               style={{
@@ -51,12 +51,27 @@ export default function Collection() {
               }}
             >
               <div className="product-image-wrap">
-                <img src={product.img} alt={product.name} />
+                {product.comingSoon ? (
+                  <div className="coming-soon-card-art">
+                    <span className="coming-soon-card-script">
+                      Made with love
+                    </span>
+                    <span className="coming-soon-card-caption">
+                      Always in the making
+                    </span>
+                  </div>
+                ) : (
+                  <img src={product.img} alt={product.name} />
+                )}
               </div>
 
               <div className="product-card-copy">
                 <h3>{product.name}</h3>
-                <div className="product-discover">Discover the flavor →</div>
+                <div className="product-discover">
+                  {product.comingSoon
+                    ? "A little about our craft →"
+                    : "Discover the flavor →"}
+                </div>
               </div>
             </Link>
           ))}

@@ -15,6 +15,8 @@ import Wholesale from "./pages/Wholesale";
 import WholesaleApplication from "./pages/WholesaleApplication";
 import NutritionFacts from "./pages/NutritionFacts";
 
+import ComingSoon from "./pages/ComingSoon";
+
 import "./App.css";
 
 export default function App() {
@@ -50,6 +52,16 @@ export default function App() {
             <>
               <Navbar />
               <NutritionFacts />
+            </>
+          }
+        />
+
+        <Route
+          path="/coming-soon"
+          element={
+            <>
+              <Navbar />
+              <ComingSoon />
             </>
           }
         />
