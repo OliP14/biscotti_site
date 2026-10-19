@@ -1,5 +1,8 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
+const MAX_PDF_SIZE = 5 * 1024 * 1024;
 
 const emptyAddress = {
   address1: "",
@@ -16,17 +19,23 @@ const initialForm = {
   lastName: "",
   phone: "",
   email: "",
-  taxId: "",
 
   shipping: { ...emptyAddress },
 
   billingSameAsShipping: true,
-
   billing: { ...emptyAddress },
+
+  resaleIntent: "yes",
+  resaleState: "IL",
+  resaleNumber: "",
+  resaleDescription: "Biscotti purchased for resale",
 };
 
 export default function WholesaleApplication() {
   const [formData, setFormData] = useState(initialForm);
+  const [resaleCertificate, setResaleCertificate] =
+    useState(null);
+
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
@@ -58,38 +67,126 @@ export default function WholesaleApplication() {
     }));
   };
 
+  const handleResaleIntent = (event) => {
+    const value = event.target.value;
+
+    setFormData((current) => ({
+      ...current,
+      resaleIntent: value,
+    }));
+
+    if (value === "no") {
+      setResaleCertificate(null);
+    }
+  };
+
+  const handleCertificateChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    setError("");
+
+    if (!file) {
+      setResaleCertificate(null);
+      return;
+    }
+
+    if (file.type !== "application/pdf") {
+      setError("Please upload a PDF document.");
+      setResaleCertificate(null);
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_PDF_SIZE) {
+      setError(
+        "The resale certificate must be 5 MB or smaller."
+      );
+      setResaleCertificate(null);
+      event.target.value = "";
+      return;
+    }
+
+    setResaleCertificate(file);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setStatus("submitting");
+    if (status === "submitting") return;
+
     setError("");
 
+    if (
+      formData.resaleIntent === "yes" &&
+      !resaleCertificate
+    ) {
+      setError(
+        "Please upload your completed resale certificate."
+      );
+      return;
+    }
+
+    if (
+      resaleCertificate &&
+      resaleCertificate.size > MAX_PDF_SIZE
+    ) {
+      setError(
+        "The resale certificate must be 5 MB or smaller."
+      );
+      return;
+    }
+
+    setStatus("submitting");
+
     try {
-      const response = await fetch("/api/wholesale-application", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const payload = new FormData();
+
+      payload.append(
+        "application",
+        JSON.stringify(formData)
+      );
+
+      if (
+        formData.resaleIntent === "yes" &&
+        resaleCertificate
+      ) {
+        payload.append(
+          "resaleCertificate",
+          resaleCertificate,
+          resaleCertificate.name
+        );
+      }
+
+      const response = await fetch(
+        "/api/wholesale-application",
+        {
+          method: "POST",
+
+          // Do not manually set Content-Type.
+          // Browser adds the multipart boundary.
+          body: payload,
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
           data.error ||
-            "We couldn't submit your application. Please try again."
+          "We couldn't submit your application."
         );
       }
 
       setStatus("success");
       setFormData(initialForm);
+      setResaleCertificate(null);
+
     } catch (err) {
-      console.error(err);
+      console.error("Wholesale application failed:", err);
 
       setError(
         err.message ||
-          "We couldn't submit your application. Please try again."
+        "We couldn't submit your application. Please try again."
       );
 
       setStatus("error");
@@ -105,7 +202,10 @@ export default function WholesaleApplication() {
               Cadagnolo's Kitchen
             </Link>
 
-            <Link to="/wholesale" className="subpage-back">
+            <Link
+              to="/wholesale"
+              className="subpage-back"
+            >
               ← Wholesale
             </Link>
           </div>
@@ -123,8 +223,9 @@ export default function WholesaleApplication() {
 
             <p>
               Your wholesale application has been submitted
-              successfully. We'll review your information and contact
-              you once your account has been approved.
+              successfully. We'll review your information
+              and contact you once your account has been
+              approved.
             </p>
 
             <Link to="/" className="primary-button">
@@ -144,7 +245,10 @@ export default function WholesaleApplication() {
             Cadagnolo's Kitchen
           </Link>
 
-          <Link to="/wholesale" className="subpage-back">
+          <Link
+            to="/wholesale"
+            className="subpage-back"
+          >
             ← Wholesale
           </Link>
         </div>
@@ -152,8 +256,11 @@ export default function WholesaleApplication() {
 
       <section className="wholesale-application-section">
         <div className="wholesale-application-shell">
+
           <div className="wholesale-application-heading">
-            <p className="brand-eyebrow">Wholesale Partners</p>
+            <p className="brand-eyebrow">
+              Wholesale Partners
+            </p>
 
             <h1>Wholesale Application</h1>
 
@@ -161,8 +268,8 @@ export default function WholesaleApplication() {
 
             <p>
               Interested in carrying Cadagnolo's Kitchen?
-              Complete the application below and we'll review your
-              information for wholesale access.
+              Complete the application below and we'll
+              review your information for wholesale access.
             </p>
           </div>
 
@@ -170,10 +277,13 @@ export default function WholesaleApplication() {
             className="wholesale-application-form"
             onSubmit={handleSubmit}
           >
+
+            {/* BUSINESS INFORMATION */}
             <fieldset>
               <legend>Business Information</legend>
 
               <div className="wholesale-form-grid">
+
                 <div className="wholesale-form-field full">
                   <label htmlFor="companyName">
                     Company Name
@@ -249,23 +359,10 @@ export default function WholesaleApplication() {
                   />
                 </div>
 
-                <div className="wholesale-form-field full">
-                  <label htmlFor="taxId">
-                    Company Tax ID / EIN
-                  </label>
-
-                  <input
-                    id="taxId"
-                    name="taxId"
-                    type="text"
-                    value={formData.taxId}
-                    onChange={updateField}
-                    required
-                  />
-                </div>
               </div>
             </fieldset>
 
+            {/* SHIPPING ADDRESS */}
             <AddressFields
               title="Shipping Address"
               type="shipping"
@@ -273,6 +370,7 @@ export default function WholesaleApplication() {
               onChange={updateAddress}
             />
 
+            {/* BILLING ADDRESS */}
             <fieldset>
               <legend>Billing Address</legend>
 
@@ -297,6 +395,144 @@ export default function WholesaleApplication() {
               )}
             </fieldset>
 
+            {/* WHOLESALE TAX INFORMATION */}
+            <fieldset>
+              <legend>Wholesale Tax Information</legend>
+
+              <p className="wholesale-form-disclaimer">
+                Business-to-business purchases are not
+                automatically tax-exempt. Businesses
+                purchasing products for resale must
+                provide valid resale documentation.
+              </p>
+
+              <div className="wholesale-form-grid">
+
+                <div className="wholesale-form-field full">
+                  <label htmlFor="resaleIntent">
+                    Are you purchasing our products for resale?
+                  </label>
+
+                  <select
+                    id="resaleIntent"
+                    name="resaleIntent"
+                    value={formData.resaleIntent}
+                    onChange={handleResaleIntent}
+                    required
+                  >
+                    <option value="yes">
+                      Yes - for resale to customers
+                    </option>
+
+                    <option value="no">
+                      No - for business use or consumption
+                    </option>
+                  </select>
+                </div>
+
+                {formData.resaleIntent === "yes" && (
+                  <>
+                    <div className="wholesale-form-field">
+                      <label htmlFor="resaleState">
+                        State of Resale Registration
+                      </label>
+
+                      <input
+                        id="resaleState"
+                        name="resaleState"
+                        type="text"
+                        maxLength={2}
+                        placeholder="IL"
+                        value={formData.resaleState}
+                        onChange={updateField}
+                        required
+                      />
+                    </div>
+
+                    <div className="wholesale-form-field">
+                      <label htmlFor="resaleNumber">
+                        Resale / Sales Tax Registration Number
+                      </label>
+
+                      <input
+                        id="resaleNumber"
+                        name="resaleNumber"
+                        type="text"
+                        value={formData.resaleNumber}
+                        onChange={updateField}
+                        required
+                      />
+                    </div>
+
+                    <div className="wholesale-form-field full">
+                      <label htmlFor="resaleDescription">
+                        Products Purchased for Resale
+                      </label>
+
+                      <input
+                        id="resaleDescription"
+                        name="resaleDescription"
+                        type="text"
+                        value={formData.resaleDescription}
+                        onChange={updateField}
+                        required
+                      />
+                    </div>
+
+                    <div className="wholesale-form-field full">
+                      <label htmlFor="resaleCertificate">
+                        Completed Resale Certificate (PDF)
+                      </label>
+
+                      <input
+                        id="resaleCertificate"
+                        name="resaleCertificate"
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleCertificateChange}
+                        required
+                      />
+
+                      <small>
+                        Illinois businesses:{" "}
+                        <a
+                          href="https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/sales/documents/sales/crt-61.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Download Form CRT-61
+                        </a>
+                        . Businesses registered in other
+                        states should upload their applicable
+                        resale certificate.
+                      </small>
+
+                      <p className="wholesale-form-disclaimer">
+                        PDF only. Maximum file size: 5 MB.
+                        Documents are securely stored and
+                        reviewed before tax-exempt purchasing
+                        privileges are granted.
+                      </p>
+
+                      {resaleCertificate && (
+                        <p className="wholesale-form-disclaimer">
+                          Selected document:{" "}
+                          {resaleCertificate.name}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <p className="wholesale-form-disclaimer">
+                Submission of a resale certificate does
+                not automatically grant tax exemption.
+                Documentation must be reviewed and approved.
+              </p>
+            </fieldset>
+
+            {/* ERRORS */}
             {error && (
               <div
                 className="wholesale-form-error"
@@ -306,6 +542,7 @@ export default function WholesaleApplication() {
               </div>
             )}
 
+            {/* SUBMIT */}
             <button
               type="submit"
               className="primary-button wholesale-submit"
@@ -317,16 +554,21 @@ export default function WholesaleApplication() {
             </button>
 
             <p className="wholesale-form-disclaimer">
-              Submitting an application does not automatically grant
-              wholesale access. Applications are reviewed before
-              wholesale ordering is enabled.
+              Submitting an application does not automatically
+              grant wholesale access. Applications are reviewed
+              before wholesale ordering is enabled.
             </p>
+
           </form>
         </div>
       </section>
     </main>
   );
 }
+
+// --------------------------------------------------
+// ADDRESS COMPONENTS
+// --------------------------------------------------
 
 function AddressFields({
   title,
@@ -354,6 +596,7 @@ function AddressInputs({
 }) {
   return (
     <div className="wholesale-form-grid">
+
       <div className="wholesale-form-field full">
         <label htmlFor={`${type}-address1`}>
           Street Address
@@ -409,7 +652,7 @@ function AddressInputs({
           name="zoneCode"
           type="text"
           placeholder="IL"
-          maxLength="3"
+          maxLength={3}
           value={address.zoneCode}
           onChange={(event) => onChange(type, event)}
           required
@@ -447,6 +690,7 @@ function AddressInputs({
           <option value="CA">Canada</option>
         </select>
       </div>
+
     </div>
   );
 }

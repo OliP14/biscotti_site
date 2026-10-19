@@ -1,13 +1,12 @@
-const SHOPIFY_API_VERSION = "2026-07";
 
-/*
- * Creates the company + location only.
- *
- * IMPORTANT:
- * We intentionally DO NOT pass companyContact here.
- * That prevents Shopify from treating the initial contact
- * as part of the company creation/permission flow.
- */
+const SHOPIFY_API_VERSION = "2026-07";
+const MAX_PDF_SIZE = 5 * 1024 * 1024;
+const MAX_REQUEST_SIZE = 7 * 1024 * 1024;
+
+// --------------------------------------------------
+// SHOPIFY GRAPHQL MUTATIONS
+// --------------------------------------------------
+
 const COMPANY_CREATE_MUTATION = `
   mutation CompanyCreate($input: CompanyCreateInput!) {
     companyCreate(input: $input) {
@@ -15,7 +14,6 @@ const COMPANY_CREATE_MUTATION = `
         id
         name
       }
-
       userErrors {
         field
         message
@@ -25,26 +23,18 @@ const COMPANY_CREATE_MUTATION = `
   }
 `;
 
-/*
- * Creates the contact/customer AFTER the company exists.
- *
- * IMPORTANT:
- * This does NOT assign a company-location role.
- * Approval happens manually in Shopify later.
- */
 const COMPANY_CONTACT_CREATE_MUTATION = `
   mutation CompanyContactCreate(
-    $companyId: ID!,
+    $companyId: ID!
     $input: CompanyContactInput!
   ) {
     companyContactCreate(
-      companyId: $companyId,
+      companyId: $companyId
       input: $input
     ) {
       companyContact {
         id
       }
-
       userErrors {
         field
         message
@@ -54,391 +44,490 @@ const COMPANY_CONTACT_CREATE_MUTATION = `
   }
 `;
 
+const COMPANY_METAFIELDS_MUTATION = `
+  mutation SaveCompanyMetafields(
+    $metafields: [MetafieldsSetInput!]!
+  ) {
+    metafieldsSet(metafields: $metafields) {
+      metafields {
+        id
+        key
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+// --------------------------------------------------
+// WORKER ROUTING
+// --------------------------------------------------
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (
-      url.pathname ===
-      "/api/wholesale-application"
-    ) {
+    if (url.pathname === "/api/wholesale-application") {
       if (request.method !== "POST") {
         return jsonResponse(
-          {
-            error: "Method not allowed.",
-          },
+          { error: "Method not allowed." },
           405,
-          {
-            Allow: "POST",
-          }
+          { Allow: "POST" }
         );
       }
 
-      return handleWholesaleApplication(
-        request,
-        env
-      );
+      return handleWholesaleApplication(request, env);
     }
 
-    /*
-     * Everything other than /api/* continues
-     * to be served by the Vite static assets.
-     */
+    // Serve the existing Vite static website.
     return env.ASSETS.fetch(request);
   },
 };
 
-/*
- * =========================================================
- * WHOLESALE APPLICATION
- * =========================================================
- */
+// --------------------------------------------------
+// MAIN WHOLESALE APPLICATION HANDLER
+// --------------------------------------------------
 
-async function handleWholesaleApplication(
-  request,
-  env
-) {
+async function handleWholesaleApplication(request, env) {
+  let companyId = null;
+  let certificateObjectKey = null;
+
   try {
     const requiredEnvironmentVariables = [
       "SHOPIFY_STORE_DOMAIN",
       "SHOPIFY_CLIENT_ID",
       "SHOPIFY_CLIENT_SECRET",
+      "RESALE_DOCUMENTS",
     ];
 
-    const missingEnvironmentVariables =
-      requiredEnvironmentVariables.filter(
-        (name) => !env[name]
-      );
+    const missing = requiredEnvironmentVariables.filter(
+      (name) => !env[name]
+    );
 
-    if (
-      missingEnvironmentVariables.length > 0
-    ) {
-      console.error(
-        "Missing environment variables:",
-        missingEnvironmentVariables
-      );
+    if (missing.length > 0) {
+      console.error("Missing Worker configuration:", missing);
 
       return jsonResponse(
-        {
-          error:
-            "The wholesale application service is not configured correctly.",
-        },
+        { error: "The application service is not configured." },
         500
+      );
+    }
+
+    // STEP 1: Check content type and declared body size.
+    const contentType =
+      request.headers.get("content-type") || "";
+
+    if (!contentType.toLowerCase().startsWith(
+      "multipart/form-data"
+    )) {
+      return jsonResponse(
+        { error: "Expected a multipart form submission." },
+        415
+      );
+    }
+
+    const declaredSize = request.headers.get(
+      "content-length"
+    );
+
+    if (declaredSize !== null) {
+      const size = Number(declaredSize);
+
+      if (!Number.isSafeInteger(size) || size < 0) {
+        return jsonResponse(
+          { error: "Invalid request size." },
+          400
+        );
+      }
+
+      if (size > MAX_REQUEST_SIZE) {
+        return jsonResponse(
+          {
+            error:
+              "The application exceeds the 7 MB request limit.",
+          },
+          413
+        );
+      }
+    }
+
+    // STEP 2: Count actual bytes while streaming.
+    // This also works without Content-Length.
+    let body;
+
+    try {
+      body = await readLimitedBody(
+        request,
+        MAX_REQUEST_SIZE
+      );
+    } catch (error) {
+      if (error.message === "REQUEST_TOO_LARGE") {
+        return jsonResponse(
+          {
+            error:
+              "The application exceeds the 7 MB request limit.",
+          },
+          413
+        );
+      }
+
+      throw error;
+    }
+
+    // STEP 3: Parse the bounded multipart body.
+    let form;
+
+    try {
+      const boundedRequest = new Request(request.url, {
+        method: "POST",
+        headers: {
+          "content-type": contentType,
+        },
+        body,
+      });
+
+      form = await boundedRequest.formData();
+    } catch {
+      return jsonResponse(
+        { error: "Invalid multipart form data." },
+        400
+      );
+    }
+
+    const rawApplication = form.get("application");
+
+    if (
+      typeof rawApplication !== "string" ||
+      rawApplication.length > 20000
+    ) {
+      return jsonResponse(
+        { error: "Invalid application data." },
+        400
       );
     }
 
     let application;
 
     try {
-      application = await request.json();
+      application = JSON.parse(rawApplication);
     } catch {
       return jsonResponse(
-        {
-          error:
-            "Invalid application data.",
-        },
+        { error: "Invalid application JSON." },
         400
       );
     }
 
+    // STEP 4: Validate application details.
     const validationError =
       validateApplication(application);
 
     if (validationError) {
       return jsonResponse(
+        { error: validationError },
+        400
+      );
+    }
+
+    // STEP 5: Validate the uploaded certificate.
+    const resale = application.resaleIntent === "yes";
+    const certificate = form.get("resaleCertificate");
+
+    if (resale) {
+      if (!(certificate instanceof File)) {
+        return jsonResponse(
+          { error: "Please upload a resale certificate." },
+          400
+        );
+      }
+
+      if (
+        certificate.size === 0 ||
+        certificate.size > MAX_PDF_SIZE ||
+        certificate.type !== "application/pdf"
+      ) {
+        return jsonResponse(
+          {
+            error:
+              "The resale certificate must be a PDF no larger than 5 MB.",
+          },
+          400
+        );
+      }
+
+      const signature = new TextDecoder().decode(
+        await certificate.slice(0, 5).arrayBuffer()
+      );
+
+      if (signature !== "%PDF-") {
+        return jsonResponse(
+          { error: "The uploaded file is not a valid PDF." },
+          400
+        );
+      }
+    } else if (certificate instanceof File &&
+               certificate.size > 0) {
+      return jsonResponse(
         {
-          error: validationError,
+          error:
+            "A resale certificate should only be uploaded for resale purchases.",
         },
         400
       );
     }
 
-    /*
-     * STEP 1
-     *
-     * Authenticate with Shopify.
-     */
-    const accessToken =
-      await getShopifyAccessToken(env);
+    // STEP 6: Authenticate using your existing
+    // Shopify client credentials.
+    const accessToken = await getShopifyAccessToken(env);
 
-    /*
-     * STEP 2
-     *
-     * Create the company + location.
-     *
-     * NO contact is created here.
-     */
-    const company =
-      await createShopifyCompany(
-        application,
+    // STEP 7: Create company and location.
+    // No company contact or B2B role is assigned here.
+    const company = await createShopifyCompany(
+      application,
+      env,
+      accessToken
+    );
+
+    companyId = company.id;
+
+    // STEP 8: Store the PDF privately in R2.
+    if (resale) {
+      certificateObjectKey = await storeResaleCertificate(
         env,
-        accessToken
+        companyId,
+        certificate
       );
+    }
 
-    /*
-     * STEP 3
-     *
-     * Create the contact separately.
-     *
-     * We deliberately DO NOT assign any
-     * company-location role.
-     */
+    // STEP 9: Save tax information and the R2
+    // reference on the Shopify company.
+    await saveCompanyTaxInformation(
+      application,
+      companyId,
+      certificateObjectKey,
+      env,
+      accessToken
+    );
+
+    // STEP 10: Create contact separately.
+    // No company-location role is assigned.
     const companyContact =
       await createShopifyCompanyContact(
         application,
-        company.id,
+        companyId,
         env,
         accessToken
       );
 
-    /*
-     * STEP 4
-     *
-     * Notify Cadagnolo's Kitchen that
-     * an application is waiting for review.
-     *
-     * Email failure does NOT undo the
-     * Shopify application.
-     */
+    // STEP 11: Notify administrator.
+    // Email failure does not undo the application.
     let notificationSent = false;
 
     try {
-      notificationSent =
-        await sendNotificationEmail(
-          application,
-          company,
-          companyContact,
-          env
-        );
+      notificationSent = await sendNotificationEmail(
+        application,
+        company,
+        companyContact,
+        env
+      );
     } catch (error) {
       console.error(
-        "Wholesale notification email failed:",
-        error
+        "Wholesale notification failed:",
+        String(error)
       );
     }
 
     return jsonResponse(
       {
         success: true,
-
         message:
           "Your wholesale application has been submitted and is pending approval.",
-
         notificationSent,
       },
       201
     );
+
   } catch (error) {
-    console.error(
-      "Wholesale application error:",
-      error
-    );
+    console.error("Wholesale application failed:", {
+      message: String(error),
+      companyId,
+      certificateObjectKey,
+    });
+
+    // An earlier Shopify operation may have succeeded.
+    // Do not tell the applicant to submit again.
+    if (companyId) {
+      return jsonResponse(
+        {
+          error:
+            "Your application was partially processed. Please contact Cadagnolo's Kitchen before submitting again.",
+          partialSubmission: true,
+        },
+        500
+      );
+    }
 
     return jsonResponse(
       {
         error:
-          "We couldn't submit your wholesale application. Please try again or contact Cadagnolo's Kitchen.",
+          "We couldn't process your application. Please try again.",
       },
       500
     );
   }
 }
 
-/*
- * =========================================================
- * SHOPIFY AUTHENTICATION
- * =========================================================
- */
+// --------------------------------------------------
+// BOUNDED REQUEST BODY READER
+// --------------------------------------------------
+
+async function readLimitedBody(request, maxBytes) {
+  if (!request.body) {
+    throw new Error("Missing request body.");
+  }
+
+  const reader = request.body.getReader();
+  const chunks = [];
+  let total = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      total += value.byteLength;
+
+      if (total > maxBytes) {
+        throw new Error("REQUEST_TOO_LARGE");
+      }
+
+      chunks.push(value);
+    }
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+
+  return new Blob(chunks);
+}
+
+// --------------------------------------------------
+// SHOPIFY AUTHENTICATION
+// --------------------------------------------------
 
 async function getShopifyAccessToken(env) {
-  const shopDomain =
-    cleanShopDomain(
-      env.SHOPIFY_STORE_DOMAIN
-    );
+  const shopDomain = cleanShopDomain(
+    env.SHOPIFY_STORE_DOMAIN
+  );
 
   const response = await fetch(
     `https://${shopDomain}/admin/oauth/access_token`,
     {
       method: "POST",
-
       headers: {
         "Content-Type":
           "application/x-www-form-urlencoded",
       },
-
       body: new URLSearchParams({
-        grant_type:
-          "client_credentials",
-
-        client_id:
-          env.SHOPIFY_CLIENT_ID,
-
-        client_secret:
-          env.SHOPIFY_CLIENT_SECRET,
+        grant_type: "client_credentials",
+        client_id: env.SHOPIFY_CLIENT_ID,
+        client_secret: env.SHOPIFY_CLIENT_SECRET,
       }),
     }
   );
 
-  let data;
+  const data = await response.json();
 
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error(
-      `Shopify authentication returned an invalid response (${response.status}).`
-    );
-  }
-
-  if (!response.ok) {
-    console.error(
-      "Shopify authentication error:",
-      response.status,
-      data
-    );
-
-    throw new Error(
-      data.error_description ||
-        data.error ||
-        "Shopify authentication failed."
-    );
-  }
-
-  if (!data.access_token) {
-    throw new Error(
-      "Shopify did not return an access token."
-    );
+  if (!response.ok || !data.access_token) {
+    console.error("Shopify authentication failed.");
+    throw new Error("Shopify authentication failed.");
   }
 
   return data.access_token;
 }
 
-/*
- * =========================================================
- * CREATE SHOPIFY COMPANY + LOCATION
- * =========================================================
- */
+// --------------------------------------------------
+// CREATE SHOPIFY COMPANY + LOCATION
+// --------------------------------------------------
 
 async function createShopifyCompany(
   application,
   env,
   accessToken
 ) {
-  const shopDomain =
-    cleanShopDomain(
-      env.SHOPIFY_STORE_DOMAIN
-    );
-
-  const shippingAddress =
-    buildAddress(
-      application.shipping,
-      application
-    );
+  const companyName = clean(application.companyName);
 
   const companyLocation = {
-    name:
-      `${clean(
-        application.companyName
-      )} - Main`,
+    name: `${companyName} - Main`,
+    phone: clean(application.phone),
 
-    phone:
-      clean(application.phone),
-
-    shippingAddress,
+    shippingAddress: buildAddress(
+      application.shipping,
+      application
+    ),
 
     billingSameAsShipping:
-      Boolean(
-        application.billingSameAsShipping
-      ),
+      application.billingSameAsShipping === true,
 
-    taxRegistrationId:
-      clean(application.taxId),
+    // No exemption is granted automatically.
+    taxExempt: false,
 
     note:
       "WHOLESALE APPLICATION STATUS: PENDING APPROVAL. " +
-      "Do not grant B2B ordering permissions until this application has been reviewed.",
+      "Do not grant ordering or tax-exempt privileges " +
+      "until the application has been reviewed.",
   };
 
-  if (
-    !application.billingSameAsShipping
-  ) {
-    companyLocation.billingAddress =
-      buildAddress(
-        application.billing,
-        application
-      );
+  if (!application.billingSameAsShipping) {
+    companyLocation.billingAddress = buildAddress(
+      application.billing,
+      application
+    );
   }
 
-  /*
-   * Notice that there is NO companyContact
-   * property in this input.
-   */
+  // The old taxRegistrationId / EIN mapping
+  // has been removed entirely.
   const variables = {
     input: {
       company: {
-        name:
-          clean(
-            application.companyName
-          ),
-
+        name: companyName,
         note:
           "WHOLESALE APPLICATION STATUS: PENDING APPROVAL\n" +
           "Submitted through cadagnolo.com.\n" +
-          "Applicant has not yet been granted B2B location permissions.",
+          "Review the resale certificate (if applicable).\n" +
+          "Applicant has not been granted B2B permissions.",
       },
 
       companyLocation,
     },
   };
 
-  const data =
-    await shopifyGraphQL(
-      env,
-      accessToken,
-      COMPANY_CREATE_MUTATION,
-      variables
-    );
+  const data = await shopifyGraphQL(
+    env,
+    accessToken,
+    COMPANY_CREATE_MUTATION,
+    variables
+  );
 
-  const result =
-    data.data?.companyCreate;
+  const result = data.data?.companyCreate;
 
-  if (!result) {
+  if (!result?.company || result.userErrors?.length) {
     throw new Error(
-      "Shopify returned an unexpected companyCreate response."
-    );
-  }
-
-  if (
-    result.userErrors?.length
-  ) {
-    console.error(
-      "Shopify companyCreate errors:",
-      result.userErrors
-    );
-
-    throw new Error(
-      result.userErrors
-        .map(
-          (error) =>
-            error.message
-        )
-        .join("; ")
-    );
-  }
-
-  if (!result.company) {
-    throw new Error(
-      "Shopify did not create the company."
+      "Shopify could not create the company: " +
+      formatUserErrors(result)
     );
   }
 
   return result.company;
 }
 
-/*
- * =========================================================
- * CREATE CONTACT — WITHOUT B2B ROLE
- * =========================================================
- */
+// --------------------------------------------------
+// CREATE COMPANY CONTACT, WITHOUT B2B ROLE
+// --------------------------------------------------
 
 async function createShopifyCompanyContact(
   application,
@@ -448,73 +537,153 @@ async function createShopifyCompanyContact(
 ) {
   const variables = {
     companyId,
-
     input: {
-      firstName:
-        clean(application.firstName),
-
-      lastName:
-        clean(application.lastName),
-
-      email:
-        clean(
-          application.email
-        ).toLowerCase(),
-
-      phone:
-        clean(application.phone),
+      firstName: clean(application.firstName),
+      lastName: clean(application.lastName),
+      email: clean(application.email).toLowerCase(),
+      phone: clean(application.phone),
     },
   };
 
-  const data =
-    await shopifyGraphQL(
-      env,
-      accessToken,
-      COMPANY_CONTACT_CREATE_MUTATION,
-      variables
-    );
+  const data = await shopifyGraphQL(
+    env,
+    accessToken,
+    COMPANY_CONTACT_CREATE_MUTATION,
+    variables
+  );
 
-  const result =
-    data.data?.companyContactCreate;
+  const result = data.data?.companyContactCreate;
 
-  if (!result) {
+  if (!result?.companyContact || result.userErrors?.length) {
     throw new Error(
-      "Shopify returned an unexpected companyContactCreate response."
-    );
-  }
-
-  if (
-    result.userErrors?.length
-  ) {
-    console.error(
-      "Shopify companyContactCreate errors:",
-      result.userErrors
-    );
-
-    throw new Error(
-      result.userErrors
-        .map(
-          (error) =>
-            error.message
-        )
-        .join("; ")
-    );
-  }
-
-  if (!result.companyContact) {
-    throw new Error(
-      "Shopify did not create the company contact."
+      "Shopify could not create the company contact: " +
+      formatUserErrors(result)
     );
   }
 
   return result.companyContact;
 }
 
-/*
- * =========================================================
- * SHOPIFY GRAPHQL HELPER
- * =========================================================
- */
+// --------------------------------------------------
+// PRIVATE R2 DOCUMENT STORAGE
+// --------------------------------------------------
+
+async function storeResaleCertificate(
+  env,
+  companyId,
+  certificate
+) {
+  const numericCompanyId = companyId.split("/").pop();
+
+  if (!/^\d+$/.test(numericCompanyId)) {
+    throw new Error("Invalid Shopify company ID.");
+  }
+
+  // Randomized path, not based on the customer's
+  // name, EIN, or registration number.
+  const objectKey =
+    `resale-certificates/${numericCompanyId}/` +
+    `${crypto.randomUUID()}.pdf`;
+
+  await env.RESALE_DOCUMENTS.put(
+    objectKey,
+    certificate.stream(),
+    {
+      httpMetadata: {
+        contentType: "application/pdf",
+        contentDisposition:
+          'attachment; filename="resale-certificate.pdf"',
+      },
+
+      customMetadata: {
+        companyId,
+        uploadedAt: new Date().toISOString(),
+
+        // This document is NOT yet malware-scanned
+        // or approved as a valid resale certificate.
+        scanStatus: "unscanned",
+      },
+    }
+  );
+
+  return objectKey;
+}
+
+// --------------------------------------------------
+// SAVE COMPANY METAFIELDS
+// --------------------------------------------------
+
+async function saveCompanyTaxInformation(
+  application,
+  companyId,
+  objectKey,
+  env,
+  accessToken
+) {
+  const resale = application.resaleIntent === "yes";
+
+  const values = {
+    application_status: "pending",
+    resale_intent: application.resaleIntent,
+
+    resale_state: resale
+      ? clean(application.resaleState).toUpperCase()
+      : "",
+
+    resale_number: resale
+      ? clean(application.resaleNumber)
+      : "",
+
+    resale_description: resale
+      ? clean(application.resaleDescription)
+      : "",
+
+    tax_document_review: resale
+      ? "pending"
+      : "not_applicable",
+
+    resale_certificate_storage: resale
+      ? "cloudflare_r2_private"
+      : "none",
+
+    resale_certificate_object_key: objectKey || "",
+  };
+
+  const metafields = Object.entries(values).map(
+    ([key, value]) => ({
+      ownerId: companyId,
+      namespace: "wholesale",
+      key,
+      type: "single_line_text_field",
+      value,
+    })
+  );
+
+  const data = await shopifyGraphQL(
+    env,
+    accessToken,
+    COMPANY_METAFIELDS_MUTATION,
+    { metafields }
+  );
+
+  const result = data.data?.metafieldsSet;
+
+  if (
+    !result?.metafields ||
+    result.userErrors?.length
+  ) {
+    throw new Error(
+      "Shopify could not save tax information: " +
+      formatUserErrors(result)
+    );
+  }
+
+  return result.metafields;
+}
+
+// --------------------------------------------------
+// SHOPIFY GRAPHQL HELPER
+// --------------------------------------------------
 
 async function shopifyGraphQL(
   env,
@@ -522,10 +691,9 @@ async function shopifyGraphQL(
   query,
   variables
 ) {
-  const shopDomain =
-    cleanShopDomain(
-      env.SHOPIFY_STORE_DOMAIN
-    );
+  const shopDomain = cleanShopDomain(
+    env.SHOPIFY_STORE_DOMAIN
+  );
 
   const response = await fetch(
     `https://${shopDomain}/admin/api/${SHOPIFY_API_VERSION}/graphql.json`,
@@ -533,17 +701,11 @@ async function shopifyGraphQL(
       method: "POST",
 
       headers: {
-        "Content-Type":
-          "application/json",
-
-        "X-Shopify-Access-Token":
-          accessToken,
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": accessToken,
       },
 
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
+      body: JSON.stringify({ query, variables }),
     }
   );
 
@@ -553,46 +715,40 @@ async function shopifyGraphQL(
     data = await response.json();
   } catch {
     throw new Error(
-      `Shopify returned an invalid response (${response.status}).`
+      `Invalid Shopify response (${response.status}).`
     );
   }
 
   if (!response.ok) {
-    console.error(
-      "Shopify HTTP error:",
-      response.status,
-      data
-    );
-
-    throw new Error(
-      `Shopify request failed (${response.status}).`
-    );
+    console.error("Shopify HTTP error:", response.status);
+    throw new Error("Shopify API request failed.");
   }
 
   if (data.errors?.length) {
-    console.error(
-      "Shopify GraphQL errors:",
-      data.errors
-    );
-
+    console.error("Shopify GraphQL errors:", data.errors);
     throw new Error(
-      data.errors
-        .map(
-          (error) =>
-            error.message
-        )
-        .join("; ")
+      data.errors.map((item) => item.message).join("; ")
     );
   }
 
   return data;
 }
 
-/*
- * =========================================================
- * RESEND ADMIN NOTIFICATION
- * =========================================================
- */
+function formatUserErrors(result) {
+  if (!result) {
+    return "Unexpected Shopify response.";
+  }
+
+  const errors = result.userErrors || [];
+
+  return errors.length
+    ? errors.map((item) => item.message).join("; ")
+    : "No result returned.";
+}
+
+// --------------------------------------------------
+// RESEND NOTIFICATION
+// --------------------------------------------------
 
 async function sendNotificationEmail(
   application,
@@ -606,32 +762,23 @@ async function sendNotificationEmail(
     !env.WHOLESALE_FROM_EMAIL
   ) {
     console.warn(
-      "Wholesale email notification skipped because Resend is not configured."
+      "Wholesale notification skipped: Resend not configured."
     );
-
     return false;
   }
 
   const applicantName =
-    `${clean(
-      application.firstName
-    )} ${clean(
-      application.lastName
-    )}`;
+    `${clean(application.firstName)} ` +
+    `${clean(application.lastName)}`;
 
-  const billingAddress =
-    application.billingSameAsShipping
-      ? "Same as shipping address"
-      : addressToText(
-          application.billing
-        );
+  const billingAddress = application.billingSameAsShipping
+    ? "Same as shipping address"
+    : addressToText(application.billing);
 
-  /*
-   * IMPORTANT:
-   *
-   * The Tax ID is intentionally NOT
-   * included in this email.
-   */
+  const resale = application.resaleIntent === "yes";
+
+  // Do not include certificate contents,
+  // R2 object keys, or registration numbers.
   const text = `
 New Cadagnolo's Kitchen wholesale application
 
@@ -656,6 +803,15 @@ ${addressToText(application.shipping)}
 BILLING ADDRESS
 ${billingAddress}
 
+WHOLESALE TAX INFORMATION
+Purchasing for resale: ${resale ? "Yes" : "No"}
+Resale registration state: ${
+  resale ? clean(application.resaleState) : "N/A"
+}
+Certificate: ${
+  resale ? "Submitted - pending review" : "Not applicable"
+}
+
 SHOPIFY COMPANY ID
 ${company.id}
 
@@ -664,9 +820,14 @@ ${companyContact.id}
 
 The company and applicant have been created in Shopify.
 
-The applicant has NOT been granted a company-location B2B role by the Cadagnolo wholesale application.
+The resale certificate (if applicable) is stored privately
+in Cloudflare R2 and linked through Shopify company metafields.
 
-Review the application in Shopify before granting wholesale ordering permissions.
+No company-location B2B role has been assigned.
+No tax exemption has been approved.
+
+Review the application before granting wholesale
+ordering permissions or tax-exempt status.
   `.trim();
 
   const response = await fetch(
@@ -675,319 +836,205 @@ Review the application in Shopify before granting wholesale ordering permissions
       method: "POST",
 
       headers: {
-        Authorization:
-          `Bearer ${env.RESEND_API_KEY}`,
-
-        "Content-Type":
-          "application/json",
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
       },
 
       body: JSON.stringify({
-        from:
-          env.WHOLESALE_FROM_EMAIL,
-
-        to: [
-          env.WHOLESALE_NOTIFICATION_EMAIL,
-        ],
-
+        from: env.WHOLESALE_FROM_EMAIL,
+        to: [env.WHOLESALE_NOTIFICATION_EMAIL],
         subject:
-          `Wholesale application pending approval: ${clean(
-            application.companyName
-          )}`,
-
+          `Wholesale application pending approval: ` +
+          clean(application.companyName),
         text,
       }),
     }
   );
 
-  let responseBody = "";
-
-  try {
-    responseBody =
-      await response.text();
-  } catch {
-    // Nothing else needed.
-  }
-
   if (!response.ok) {
     console.error(
-      "Resend error:",
-      response.status,
-      responseBody
+      "Resend notification failed:",
+      response.status
     );
-
     return false;
   }
-
-  console.log(
-    "Wholesale notification email sent."
-  );
 
   return true;
 }
 
-/*
- * =========================================================
- * ADDRESS
- * =========================================================
- */
+// --------------------------------------------------
+// ADDRESS HELPERS
+// --------------------------------------------------
 
-function buildAddress(
-  address,
-  applicant
-) {
+function buildAddress(address, applicant) {
   const result = {
-    firstName:
-      clean(applicant.firstName),
+    firstName: clean(applicant.firstName),
+    lastName: clean(applicant.lastName),
 
-    lastName:
-      clean(applicant.lastName),
+    address1: clean(address.address1),
+    city: clean(address.city),
+    zoneCode: clean(address.zoneCode).toUpperCase(),
+    zip: clean(address.zip),
+    countryCode: clean(address.countryCode).toUpperCase(),
 
-    address1:
-      clean(address.address1),
-
-    city:
-      clean(address.city),
-
-    zoneCode:
-      clean(
-        address.zoneCode
-      ).toUpperCase(),
-
-    zip:
-      clean(address.zip),
-
-    countryCode:
-      clean(
-        address.countryCode
-      ).toUpperCase(),
-
-    phone:
-      clean(applicant.phone),
+    phone: clean(applicant.phone),
   };
 
-  if (
-    clean(address.address2)
-  ) {
-    result.address2 =
-      clean(address.address2);
+  if (clean(address.address2)) {
+    result.address2 = clean(address.address2);
   }
 
   return result;
 }
 
-/*
- * =========================================================
- * VALIDATION
- * =========================================================
- */
+function addressToText(address) {
+  if (!address) return "";
 
-function validateApplication(
-  application
-) {
+  return [
+    clean(address.address1),
+    clean(address.address2),
+
+    [
+      clean(address.city),
+      clean(address.zoneCode).toUpperCase(),
+      clean(address.zip),
+    ].filter(Boolean).join(" "),
+
+    clean(address.countryCode).toUpperCase(),
+  ].filter(Boolean).join("\n");
+}
+
+// --------------------------------------------------
+// APPLICATION VALIDATION
+// --------------------------------------------------
+
+function validateApplication(application) {
   if (
     !application ||
-    typeof application !== "object"
+    typeof application !== "object" ||
+    Array.isArray(application)
   ) {
     return "Invalid application.";
   }
 
   const requiredFields = [
-    [
-      "Company name",
-      application.companyName,
-    ],
+    ["Company name", application.companyName],
+    ["First name", application.firstName],
+    ["Last name", application.lastName],
+    ["Phone", application.phone],
+    ["Email", application.email],
 
-    [
-      "First name",
-      application.firstName,
-    ],
-
-    [
-      "Last name",
-      application.lastName,
-    ],
-
-    [
-      "Phone",
-      application.phone,
-    ],
-
-    [
-      "Email",
-      application.email,
-    ],
-
-    [
-      "Company Tax ID",
-      application.taxId,
-    ],
-
-    [
-      "Shipping street address",
-      application.shipping?.address1,
-    ],
-
-    [
-      "Shipping city",
-      application.shipping?.city,
-    ],
-
-    [
-      "Shipping state/province",
-      application.shipping?.zoneCode,
-    ],
-
-    [
-      "Shipping ZIP/postal code",
-      application.shipping?.zip,
-    ],
-
-    [
-      "Shipping country",
-      application.shipping?.countryCode,
-    ],
+    ["Shipping street address", application.shipping?.address1],
+    ["Shipping city", application.shipping?.city],
+    ["Shipping state", application.shipping?.zoneCode],
+    ["Shipping ZIP", application.shipping?.zip],
+    ["Shipping country", application.shipping?.countryCode],
   ];
 
-  if (
-    !application.billingSameAsShipping
-  ) {
+  if (application.billingSameAsShipping !== true &&
+      application.billingSameAsShipping !== false) {
+    return "Invalid billing address selection.";
+  }
+
+  if (!application.billingSameAsShipping) {
     requiredFields.push(
-      [
-        "Billing street address",
-        application.billing?.address1,
-      ],
-
-      [
-        "Billing city",
-        application.billing?.city,
-      ],
-
-      [
-        "Billing state/province",
-        application.billing?.zoneCode,
-      ],
-
-      [
-        "Billing ZIP/postal code",
-        application.billing?.zip,
-      ],
-
-      [
-        "Billing country",
-        application.billing?.countryCode,
-      ]
+      ["Billing street address", application.billing?.address1],
+      ["Billing city", application.billing?.city],
+      ["Billing state", application.billing?.zoneCode],
+      ["Billing ZIP", application.billing?.zip],
+      ["Billing country", application.billing?.countryCode]
     );
   }
 
-  const missingFields =
-    requiredFields
-      .filter(
-        ([, value]) =>
-          !clean(value)
-      )
-      .map(
-        ([name]) => name
-      );
+  const missing = requiredFields
+    .filter(([, value]) => !clean(value))
+    .map(([name]) => name);
 
-  if (
-    missingFields.length > 0
-  ) {
-    return (
-      "Please complete the following fields: " +
-      missingFields.join(", ")
-    );
+  if (missing.length) {
+    return "Please complete: " + missing.join(", ");
   }
-
-  const email =
-    clean(application.email);
 
   if (
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      email
+      clean(application.email)
     )
   ) {
     return "Please enter a valid email address.";
   }
 
-  if (
-    clean(
-      application.companyName
-    ).length > 200
-  ) {
+  if (clean(application.companyName).length > 200) {
     return "Company name is too long.";
   }
 
   if (
-    clean(
-      application.firstName
-    ).length > 100 ||
-    clean(
-      application.lastName
-    ).length > 100
+    clean(application.firstName).length > 100 ||
+    clean(application.lastName).length > 100
   ) {
     return "Applicant name is too long.";
+  }
+
+  if (!["yes", "no"].includes(application.resaleIntent)) {
+    return "Please specify whether the purchase is for resale.";
+  }
+
+  if (application.resaleIntent === "yes") {
+    if (
+      !clean(application.resaleState) ||
+      !clean(application.resaleNumber) ||
+      !clean(application.resaleDescription)
+    ) {
+      return "Please complete the resale tax information.";
+    }
+
+    if (
+      !/^[A-Za-z]{2}$/.test(
+        clean(application.resaleState)
+      )
+    ) {
+      return "Please enter a two-letter registration state.";
+    }
+
+    if (
+      clean(application.resaleNumber).length > 100 ||
+      clean(application.resaleDescription).length > 500
+    ) {
+      return "Resale tax information is too long.";
+    }
+  }
+
+  const addresses = [application.shipping];
+
+  if (!application.billingSameAsShipping) {
+    addresses.push(application.billing);
+  }
+
+  for (const address of addresses) {
+    if (
+      !["US", "CA"].includes(
+        clean(address.countryCode).toUpperCase()
+      )
+    ) {
+      return "Invalid address country.";
+    }
   }
 
   return null;
 }
 
-/*
- * =========================================================
- * HELPERS
- * =========================================================
- */
+// --------------------------------------------------
+// GENERAL HELPERS
+// --------------------------------------------------
 
 function clean(value) {
-  if (
-    typeof value !== "string"
-  ) {
-    return "";
-  }
-
-  return value.trim();
+  return typeof value === "string"
+    ? value.trim()
+    : "";
 }
 
 function cleanShopDomain(value) {
   return clean(value)
-    .replace(
-      /^https?:\/\//i,
-      ""
-    )
-    .replace(
-      /\/+$/,
-      ""
-    );
-}
-
-function addressToText(address) {
-  if (!address) {
-    return "";
-  }
-
-  return [
-    clean(address.address1),
-
-    clean(address.address2),
-
-    [
-      clean(address.city),
-
-      clean(
-        address.zoneCode
-      ).toUpperCase(),
-
-      clean(address.zip),
-    ]
-      .filter(Boolean)
-      .join(" "),
-
-    clean(
-      address.countryCode
-    ).toUpperCase(),
-  ]
-    .filter(Boolean)
-    .join("\n");
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/+$/, "");
 }
 
 function jsonResponse(
@@ -999,14 +1046,9 @@ function jsonResponse(
     JSON.stringify(body),
     {
       status,
-
       headers: {
-        "Content-Type":
-          "application/json; charset=UTF-8",
-
-        "Cache-Control":
-          "no-store",
-
+        "Content-Type": "application/json; charset=UTF-8",
+        "Cache-Control": "no-store",
         ...additionalHeaders,
       },
     }
