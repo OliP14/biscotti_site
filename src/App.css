@@ -1167,6 +1167,11 @@ section {
 
 /* Wholesale Application */
 
+
+/* ============================================
+   WHOLESALE APPLICATION
+============================================ */
+
 .wholesale-application-section {
   padding: 6rem 1.5rem 7rem;
 }
@@ -1175,6 +1180,10 @@ section {
   width: min(850px, 100%);
   margin: 0 auto;
 }
+
+/* ============================================
+   APPLICATION HEADING
+============================================ */
 
 .wholesale-application-heading {
   max-width: 680px;
@@ -1200,6 +1209,10 @@ section {
   line-height: 1.75;
 }
 
+/* ============================================
+   FORM CONTAINER
+============================================ */
+
 .wholesale-application-form {
   padding: clamp(1.5rem, 5vw, 3.5rem);
   border: 1px solid var(--cadagnolo-line);
@@ -1207,7 +1220,12 @@ section {
   box-shadow: 0 24px 60px rgba(72, 69, 53, 0.08);
 }
 
+/* ============================================
+   FORM SECTIONS
+============================================ */
+
 .wholesale-application-form fieldset {
+  min-width: 0;
   margin: 0 0 3rem;
   padding: 0;
   border: 0;
@@ -1224,15 +1242,27 @@ section {
   font-weight: 600;
 }
 
+/* ============================================
+   FORM GRID
+============================================ */
+
 .wholesale-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.3rem;
 }
 
+.wholesale-form-field {
+  min-width: 0;
+}
+
 .wholesale-form-field.full {
   grid-column: 1 / -1;
 }
+
+/* ============================================
+   LABELS
+============================================ */
 
 .wholesale-form-field label {
   display: block;
@@ -1251,24 +1281,48 @@ section {
   text-transform: none;
 }
 
-.wholesale-form-field input,
+/* ============================================
+   TEXT INPUTS & SELECTS
+============================================ */
+
+.wholesale-form-field input:not([type="file"]),
 .wholesale-form-field select {
   width: 100%;
   min-height: 50px;
   padding: 0.85rem 1rem;
+
   border: 1px solid rgba(86, 106, 83, 0.3);
   border-radius: 3px;
+
   background: #fff;
   color: var(--cadagnolo-ink);
   font: inherit;
   outline: none;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
 }
 
-.wholesale-form-field input:focus,
+.wholesale-form-field input:not([type="file"]):focus,
 .wholesale-form-field select:focus {
   border-color: var(--cadagnolo-green-dark);
   box-shadow: 0 0 0 2px rgba(63, 81, 64, 0.1);
+  background: var(--cadagnolo-white);
 }
+
+.wholesale-form-field input::placeholder {
+  color: #969d92;
+}
+
+.wholesale-form-field select {
+  cursor: pointer;
+}
+
+/* ============================================
+   BILLING ADDRESS CHECKBOX
+============================================ */
 
 .wholesale-checkbox {
   display: flex;
@@ -1282,16 +1336,346 @@ section {
 .wholesale-checkbox input {
   width: 18px;
   height: 18px;
+  flex-shrink: 0;
   accent-color: var(--cadagnolo-green-dark);
 }
+
+.wholesale-checkbox span {
+  font-size: 0.95rem;
+}
+
+/* ============================================
+   WHOLESALE TAX SECTION
+============================================ */
+
+.wholesale-tax-fieldset {
+  position: relative;
+}
+
+.wholesale-tax-intro {
+  max-width: 650px;
+  margin: 0 0 1.8rem;
+
+  color: var(--cadagnolo-brown);
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+/* ============================================
+   FILE UPLOAD HEADER
+============================================ */
+
+.wholesale-upload-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.7rem 1rem;
+  margin-bottom: 0.7rem;
+}
+
+.wholesale-form-field .wholesale-upload-heading label {
+  margin: 0;
+}
+
+.wholesale-upload-heading a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  color: var(--cadagnolo-green-dark);
+  font-size: 0.83rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+
+  transition: color 180ms ease;
+}
+
+.wholesale-upload-heading a:hover {
+  color: var(--cadagnolo-sage);
+}
+
+/* ============================================
+   HIDDEN NATIVE FILE INPUT
+============================================ */
+
+/*
+  The input remains keyboard accessible.
+  The visible upload area is its associated label.
+*/
+
+.wholesale-form-field input.wholesale-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+
+/* ============================================
+   DRAG & DROP ZONE
+============================================ */
+
+.wholesale-upload-zone {
+  width: 100%;
+  overflow: hidden;
+
+  border: 1.5px dashed rgba(86, 106, 83, 0.42);
+  border-radius: 6px;
+
+  background: rgba(245, 240, 227, 0.36);
+
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.wholesale-upload-zone:hover,
+.wholesale-upload-zone.is-dragging,
+.wholesale-upload-zone:focus-within {
+  border-color: var(--cadagnolo-green-dark);
+  background: rgba(201, 208, 189, 0.26);
+}
+
+.wholesale-upload-zone.has-file {
+  border-style: solid;
+  border-color: rgba(86, 106, 83, 0.35);
+  background: rgba(201, 208, 189, 0.16);
+}
+
+/* ============================================
+   EMPTY UPLOAD STATE
+============================================ */
+
+.wholesale-form-field .wholesale-upload-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  margin: 0;
+  padding: 2.5rem 1.5rem;
+
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+}
+
+.wholesale-upload-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+
+  border: 1px solid rgba(86, 106, 83, 0.18);
+  border-radius: 50%;
+
+  background: rgba(201, 208, 189, 0.38);
+  color: var(--cadagnolo-green-dark);
+
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 1.65rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.wholesale-upload-prompt strong {
+  display: block;
+  color: var(--cadagnolo-green-dark);
+  font-size: 0.94rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.wholesale-upload-prompt > span:not(
+  .wholesale-upload-icon
+) {
+  display: block;
+  margin-top: 0.35rem;
+
+  color: var(--cadagnolo-muted);
+  font-size: 0.84rem;
+  font-weight: 400;
+}
+
+.wholesale-upload-prompt small {
+  display: block;
+  margin-top: 0.9rem;
+
+  color: var(--cadagnolo-muted);
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.wholesale-upload-prompt:hover strong {
+  color: var(--cadagnolo-green-deep);
+}
+
+/* ============================================
+   SELECTED DOCUMENT
+============================================ */
+
+.wholesale-upload-selected {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.4rem;
+}
+
+.wholesale-upload-file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 45px;
+  height: 50px;
+  flex-shrink: 0;
+
+  border: 1px solid rgba(86, 106, 83, 0.16);
+  border-radius: 4px;
+
+  background: rgba(201, 208, 189, 0.38);
+  color: var(--cadagnolo-green-dark);
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.wholesale-upload-file-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.wholesale-upload-file-details strong {
+  color: var(--cadagnolo-green-dark);
+  font-size: 0.91rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.wholesale-upload-file-details span {
+  color: var(--cadagnolo-muted);
+  font-size: 0.79rem;
+}
+
+.wholesale-upload-remove {
+  flex-shrink: 0;
+
+  padding: 0.4rem;
+  border: 0;
+  background: transparent;
+
+  color: #9a5148;
+  font-size: 0.84rem;
+  font-weight: 600;
+
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  transition: color 180ms ease;
+}
+
+.wholesale-upload-remove:hover {
+  color: #743b34;
+}
+
+.wholesale-upload-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   DOCUMENT HELPER TEXT
+============================================ */
+
+.wholesale-form-field > small {
+  display: block;
+  margin-top: 0.85rem;
+  color: var(--cadagnolo-muted);
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+/* ============================================
+   PRIVATE STORAGE / APPROVAL NOTICE
+============================================ */
+
+.wholesale-tax-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+
+  margin-top: 1.7rem;
+  padding: 1.1rem 1.25rem;
+
+  border-left: 2px solid var(--cadagnolo-sage);
+  background: rgba(201, 208, 189, 0.25);
+}
+
+.wholesale-tax-notice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 23px;
+  height: 23px;
+
+  border: 1px solid var(--cadagnolo-sage);
+  border-radius: 50%;
+
+  color: var(--cadagnolo-green-dark);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.wholesale-tax-notice p {
+  margin: 0;
+
+  color: var(--cadagnolo-green-dark);
+  font-size: 0.87rem;
+  line-height: 1.65;
+}
+
+/* ============================================
+   FORM ERRORS
+============================================ */
 
 .wholesale-form-error {
   margin-bottom: 1.5rem;
   padding: 1rem 1.2rem;
-  border: 1px solid #a94442;
+
+  border: 1px solid rgba(169, 68, 66, 0.5);
+  border-left: 3px solid #a94442;
+
   background: #fff4f4;
   color: #8a2927;
+
+  font-size: 0.92rem;
+  line-height: 1.65;
 }
+
+/* ============================================
+   SUBMIT BUTTON
+============================================ */
 
 .wholesale-submit {
   width: 100%;
@@ -1303,22 +1687,34 @@ section {
   opacity: 0.65;
 }
 
+/* ============================================
+   FINAL FORM DISCLAIMER
+============================================ */
+
 .wholesale-form-disclaimer {
-  margin: 1rem auto 0;
   max-width: 600px;
+  margin: 1rem auto 0;
+
   color: var(--cadagnolo-muted);
   font-size: 0.78rem;
-  line-height: 1.6;
+  line-height: 1.65;
   text-align: center;
 }
+
+/* ============================================
+   SUCCESS SCREEN
+============================================ */
 
 .wholesale-application-success {
   width: min(700px, 100%);
   margin: 3rem auto;
+
   padding: clamp(2.5rem, 7vw, 5rem);
+
   border: 1px solid var(--cadagnolo-line);
   background: var(--cadagnolo-white);
   box-shadow: 0 24px 60px rgba(72, 69, 53, 0.08);
+
   text-align: center;
 }
 
@@ -1326,9 +1722,17 @@ section {
   margin-top: 2rem;
 }
 
+/* ============================================
+   RESPONSIVE — TABLET / MOBILE
+============================================ */
+
 @media (max-width: 680px) {
   .wholesale-application-section {
     padding: 4rem 1rem 5rem;
+  }
+
+  .wholesale-application-heading {
+    margin-bottom: 2.5rem;
   }
 
   .wholesale-form-grid {
@@ -1342,7 +1746,49 @@ section {
   .wholesale-application-form {
     padding: 1.5rem;
   }
+
+  .wholesale-application-form fieldset {
+    margin-bottom: 2.5rem;
+  }
+
+  .wholesale-application-form legend {
+    font-size: 1.65rem;
+  }
+
+  .wholesale-upload-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .wholesale-form-field .wholesale-upload-prompt {
+    padding: 2rem 1rem;
+  }
+
+  .wholesale-upload-selected {
+    padding: 1rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .wholesale-upload-file-details {
+    flex-basis: calc(100% - 65px);
+  }
+
+  .wholesale-upload-remove {
+    margin-left: auto;
+  }
+
+  .wholesale-tax-notice {
+    padding: 1rem;
+  }
+
+  .wholesale-application-success {
+    margin: 2rem auto;
+    padding: 2.5rem 1.5rem;
+  }
 }
+
 
 /* Responsive */
 @media (max-width: 960px) {

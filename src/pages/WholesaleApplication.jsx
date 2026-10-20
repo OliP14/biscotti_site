@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 const MAX_PDF_SIZE = 5 * 1024 * 1024;
@@ -27,8 +27,6 @@ const initialForm = {
 
   resaleIntent: "yes",
   resaleState: "IL",
-  resaleNumber: "",
-  resaleDescription: "Biscotti purchased for resale",
 };
 
 export default function WholesaleApplication() {
@@ -38,6 +36,9 @@ export default function WholesaleApplication() {
 
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   const updateField = (event) => {
     const { name, value } = event.target;
@@ -76,37 +77,56 @@ export default function WholesaleApplication() {
     }));
 
     if (value === "no") {
-      setResaleCertificate(null);
+      removeCertificate();
     }
   };
 
-  const handleCertificateChange = (event) => {
-    const file = event.target.files?.[0] || null;
+  const removeCertificate = () => {
+    setResaleCertificate(null);
 
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const selectCertificate = (file) => {
     setError("");
 
-    if (!file) {
-      setResaleCertificate(null);
+    if (!file) return;
+
+    if (
+      file.type !== "application/pdf" ||
+      !file.name.toLowerCase().endsWith(".pdf")
+    ) {
+      setError("Please select a PDF document.");
+      removeCertificate();
       return;
     }
 
-    if (file.type !== "application/pdf") {
-      setError("Please upload a PDF document.");
-      setResaleCertificate(null);
-      event.target.value = "";
-      return;
-    }
-
-    if (file.size > MAX_PDF_SIZE) {
+    if (file.size === 0 || file.size > MAX_PDF_SIZE) {
       setError(
-        "The resale certificate must be 5 MB or smaller."
+        "The document must be a PDF no larger than 5 MB."
       );
-      setResaleCertificate(null);
-      event.target.value = "";
+      removeCertificate();
       return;
     }
 
     setResaleCertificate(file);
+  };
+
+  const handleFileChange = (event) => {
+    selectCertificate(event.target.files?.[0]);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+
+    if (status === "submitting") return;
+
+    const file = event.dataTransfer.files?.[0];
+
+    selectCertificate(file);
   };
 
   const handleSubmit = async (event) => {
@@ -122,16 +142,6 @@ export default function WholesaleApplication() {
     ) {
       setError(
         "Please upload your completed resale certificate."
-      );
-      return;
-    }
-
-    if (
-      resaleCertificate &&
-      resaleCertificate.size > MAX_PDF_SIZE
-    ) {
-      setError(
-        "The resale certificate must be 5 MB or smaller."
       );
       return;
     }
@@ -161,9 +171,6 @@ export default function WholesaleApplication() {
         "/api/wholesale-application",
         {
           method: "POST",
-
-          // Do not manually set Content-Type.
-          // Browser adds the multipart boundary.
           body: payload,
         }
       );
@@ -179,14 +186,14 @@ export default function WholesaleApplication() {
 
       setStatus("success");
       setFormData(initialForm);
-      setResaleCertificate(null);
+      removeCertificate();
 
     } catch (err) {
       console.error("Wholesale application failed:", err);
 
       setError(
         err.message ||
-        "We couldn't submit your application. Please try again."
+        "We couldn't submit your application."
       );
 
       setStatus("error");
@@ -283,12 +290,10 @@ export default function WholesaleApplication() {
               <legend>Business Information</legend>
 
               <div className="wholesale-form-grid">
-
                 <div className="wholesale-form-field full">
                   <label htmlFor="companyName">
                     Company Name
                   </label>
-
                   <input
                     id="companyName"
                     name="companyName"
@@ -303,7 +308,6 @@ export default function WholesaleApplication() {
                   <label htmlFor="firstName">
                     First Name
                   </label>
-
                   <input
                     id="firstName"
                     name="firstName"
@@ -318,7 +322,6 @@ export default function WholesaleApplication() {
                   <label htmlFor="lastName">
                     Last Name
                   </label>
-
                   <input
                     id="lastName"
                     name="lastName"
@@ -333,7 +336,6 @@ export default function WholesaleApplication() {
                   <label htmlFor="phone">
                     Phone
                   </label>
-
                   <input
                     id="phone"
                     name="phone"
@@ -348,7 +350,6 @@ export default function WholesaleApplication() {
                   <label htmlFor="email">
                     Email
                   </label>
-
                   <input
                     id="email"
                     name="email"
@@ -358,11 +359,10 @@ export default function WholesaleApplication() {
                     required
                   />
                 </div>
-
               </div>
             </fieldset>
 
-            {/* SHIPPING ADDRESS */}
+            {/* SHIPPING */}
             <AddressFields
               title="Shipping Address"
               type="shipping"
@@ -370,7 +370,7 @@ export default function WholesaleApplication() {
               onChange={updateAddress}
             />
 
-            {/* BILLING ADDRESS */}
+            {/* BILLING */}
             <fieldset>
               <legend>Billing Address</legend>
 
@@ -380,7 +380,6 @@ export default function WholesaleApplication() {
                   checked={formData.billingSameAsShipping}
                   onChange={handleSameAddress}
                 />
-
                 <span>
                   Billing address is the same as shipping
                 </span>
@@ -395,19 +394,17 @@ export default function WholesaleApplication() {
               )}
             </fieldset>
 
-            {/* WHOLESALE TAX INFORMATION */}
-            <fieldset>
+            {/* TAX DOCUMENTATION */}
+            <fieldset className="wholesale-tax-fieldset">
               <legend>Wholesale Tax Information</legend>
 
-              <p className="wholesale-form-disclaimer">
-                Business-to-business purchases are not
-                automatically tax-exempt. Businesses
-                purchasing products for resale must
-                provide valid resale documentation.
+              <p className="wholesale-tax-intro">
+                To request tax-exempt purchasing, please
+                provide documentation confirming your
+                products are purchased for resale.
               </p>
 
               <div className="wholesale-form-grid">
-
                 <div className="wholesale-form-field full">
                   <label htmlFor="resaleIntent">
                     Are you purchasing our products for resale?
@@ -421,18 +418,18 @@ export default function WholesaleApplication() {
                     required
                   >
                     <option value="yes">
-                      Yes - for resale to customers
+                      Yes, for resale to customers
                     </option>
 
                     <option value="no">
-                      No - for business use or consumption
+                      No, for business use or consumption
                     </option>
                   </select>
                 </div>
 
                 {formData.resaleIntent === "yes" && (
                   <>
-                    <div className="wholesale-form-field">
+                    <div className="wholesale-form-field full">
                       <label htmlFor="resaleState">
                         State of Resale Registration
                       </label>
@@ -449,90 +446,122 @@ export default function WholesaleApplication() {
                       />
                     </div>
 
-                    <div className="wholesale-form-field">
-                      <label htmlFor="resaleNumber">
-                        Resale / Sales Tax Registration Number
-                      </label>
-
-                      <input
-                        id="resaleNumber"
-                        name="resaleNumber"
-                        type="text"
-                        value={formData.resaleNumber}
-                        onChange={updateField}
-                        required
-                      />
-                    </div>
-
                     <div className="wholesale-form-field full">
-                      <label htmlFor="resaleDescription">
-                        Products Purchased for Resale
-                      </label>
+                      <div className="wholesale-upload-heading">
+                        <label htmlFor="resaleCertificate">
+                          Resale Certificate
+                        </label>
 
-                      <input
-                        id="resaleDescription"
-                        name="resaleDescription"
-                        type="text"
-                        value={formData.resaleDescription}
-                        onChange={updateField}
-                        required
-                      />
-                    </div>
-
-                    <div className="wholesale-form-field full">
-                      <label htmlFor="resaleCertificate">
-                        Completed Resale Certificate (PDF)
-                      </label>
-
-                      <input
-                        id="resaleCertificate"
-                        name="resaleCertificate"
-                        type="file"
-                        accept=".pdf,application/pdf"
-                        onChange={handleCertificateChange}
-                        required
-                      />
-
-                      <small>
-                        Illinois businesses:{" "}
                         <a
                           href="https://tax.illinois.gov/content/dam/soi/en/web/tax/forms/sales/documents/sales/crt-61.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Download Form CRT-61
+                          Download Illinois CRT-61 ↗
                         </a>
-                        . Businesses registered in other
-                        states should upload their applicable
-                        resale certificate.
+                      </div>
+
+                      <input
+                        ref={fileInputRef}
+                        id="resaleCertificate"
+                        name="resaleCertificate"
+                        className="wholesale-file-input"
+                        type="file"
+                        accept=".pdf,application/pdf"
+                        onChange={handleFileChange}
+                        aria-describedby="certificate-help"
+                      />
+
+                      <div
+                        className={
+                          `wholesale-upload-zone ${
+                            isDragging ? "is-dragging" : ""
+                          } ${
+                            resaleCertificate ? "has-file" : ""
+                          }`
+                        }
+                        onDragOver={(event) => {
+                          event.preventDefault();
+                          setIsDragging(true);
+                        }}
+                        onDragLeave={(event) => {
+                          event.preventDefault();
+                          setIsDragging(false);
+                        }}
+                        onDrop={handleDrop}
+                      >
+                        {resaleCertificate ? (
+                          <div className="wholesale-upload-selected">
+                            <span className="wholesale-upload-file-icon">
+                              PDF
+                            </span>
+
+                            <div className="wholesale-upload-file-details">
+                              <strong>
+                                {resaleCertificate.name}
+                              </strong>
+                              <span>
+                                {(
+                                  resaleCertificate.size /
+                                  (1024 * 1024)
+                                ).toFixed(2)} MB
+                              </span>
+                            </div>
+
+                            <button
+                              type="button"
+                              className="wholesale-upload-remove"
+                              onClick={removeCertificate}
+                              disabled={status === "submitting"}
+                              aria-label="Remove uploaded certificate"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <label
+                            htmlFor="resaleCertificate"
+                            className="wholesale-upload-prompt"
+                          >
+                            <span className="wholesale-upload-icon">
+                              ↑
+                            </span>
+
+                            <strong>
+                              Choose a PDF to upload
+                            </strong>
+
+                            <span>
+                              Or drag and drop your file here
+                            </span>
+
+                            <small>
+                              Completed and signed certificate
+                              · Maximum 5 MB
+                            </small>
+                          </label>
+                        )}
+                      </div>
+
+                      <small id="certificate-help">
+                        Illinois businesses should complete
+                        Form CRT-61. Other businesses should
+                        upload their applicable resale certificate.
                       </small>
-
-                      <p className="wholesale-form-disclaimer">
-                        PDF only. Maximum file size: 5 MB.
-                        Documents are securely stored and
-                        reviewed before tax-exempt purchasing
-                        privileges are granted.
-                      </p>
-
-                      {resaleCertificate && (
-                        <p className="wholesale-form-disclaimer">
-                          Selected document:{" "}
-                          {resaleCertificate.name}
-                        </p>
-                      )}
                     </div>
                   </>
                 )}
               </div>
 
-              <p className="wholesale-form-disclaimer">
-                Submission of a resale certificate does
-                not automatically grant tax exemption.
-                Documentation must be reviewed and approved.
-              </p>
+              <div className="wholesale-tax-notice">
+                <p>
+                  Your documents are stored privately.
+                  Tax-exempt purchasing privileges are
+                  subject to verification and approval.
+                </p>
+              </div>
             </fieldset>
 
-            {/* ERRORS */}
             {error && (
               <div
                 className="wholesale-form-error"
@@ -542,7 +571,6 @@ export default function WholesaleApplication() {
               </div>
             )}
 
-            {/* SUBMIT */}
             <button
               type="submit"
               className="primary-button wholesale-submit"
@@ -554,11 +582,9 @@ export default function WholesaleApplication() {
             </button>
 
             <p className="wholesale-form-disclaimer">
-              Submitting an application does not automatically
-              grant wholesale access. Applications are reviewed
-              before wholesale ordering is enabled.
+              Wholesale access is granted after your
+              application has been reviewed and approved.
             </p>
-
           </form>
         </div>
       </section>
@@ -579,7 +605,6 @@ function AddressFields({
   return (
     <fieldset>
       <legend>{title}</legend>
-
       <AddressInputs
         type={type}
         address={address}

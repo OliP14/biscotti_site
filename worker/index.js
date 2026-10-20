@@ -44,6 +44,7 @@ const COMPANY_CONTACT_CREATE_MUTATION = `
   }
 `;
 
+
 const COMPANY_METAFIELDS_MUTATION = `
   mutation SaveCompanyMetafields(
     $metafields: [MetafieldsSetInput!]!
@@ -51,15 +52,19 @@ const COMPANY_METAFIELDS_MUTATION = `
     metafieldsSet(metafields: $metafields) {
       metafields {
         id
+        namespace
         key
+        value
       }
       userErrors {
         field
         message
+        code
       }
     }
   }
 `;
+
 
 // --------------------------------------------------
 // WORKER ROUTING
@@ -290,15 +295,19 @@ async function handleWholesaleApplication(request, env) {
     );
 
     companyId = company.id;
-
+    
+    
     // STEP 8: Store the PDF privately in R2.
+    // Organize documents by company name + Shopify ID.
     if (resale) {
       certificateObjectKey = await storeResaleCertificate(
         env,
         companyId,
+        application.companyName,
         certificate
       );
     }
+
 
     // STEP 9: Save tax information and the R2
     // reference on the Shopify company.
@@ -568,9 +577,21 @@ async function createShopifyCompanyContact(
 // PRIVATE R2 DOCUMENT STORAGE
 // --------------------------------------------------
 
+
+function slugifyCompanyName(name) {
+  return String(name || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 70) || "company";
+}
+
 async function storeResaleCertificate(
   env,
   companyId,
+  companyName,
   certificate
 ) {
   const numericCompanyId = companyId.split("/").pop();
@@ -579,11 +600,20 @@ async function storeResaleCertificate(
     throw new Error("Invalid Shopify company ID.");
   }
 
-  // Randomized path, not based on the customer's
-  // name, EIN, or registration number.
+  const companySlug = slugifyCompanyName(companyName);
+
+  const companyFolder =
+    `${companySlug}-${numericCompanyId}`;
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  // Random suffix ensures multiple documents uploaded
+  // on the same day do not overwrite one another.
+  const fileName =
+    `CRT-61_${date}_${crypto.randomUUID()}.pdf`;
+
   const objectKey =
-    `resale-certificates/${numericCompanyId}/` +
-    `${crypto.randomUUID()}.pdf`;
+    `resale-certificates/${companyFolder}/${fileName}`;
 
   await env.RESALE_DOCUMENTS.put(
     objectKey,
@@ -594,13 +624,10 @@ async function storeResaleCertificate(
         contentDisposition:
           'attachment; filename="resale-certificate.pdf"',
       },
-
       customMetadata: {
         companyId,
+        companyName: String(companyName).slice(0, 200),
         uploadedAt: new Date().toISOString(),
-
-        // This document is NOT yet malware-scanned
-        // or approved as a valid resale certificate.
         scanStatus: "unscanned",
       },
     }
@@ -609,9 +636,11 @@ async function storeResaleCertificate(
   return objectKey;
 }
 
+
 // --------------------------------------------------
 // SAVE COMPANY METAFIELDS
 // --------------------------------------------------
+
 
 async function saveCompanyTaxInformation(
   application,
@@ -625,29 +654,17 @@ async function saveCompanyTaxInformation(
   const values = {
     application_status: "pending",
     resale_intent: application.resaleIntent,
-
-    resale_state: resale
-      ? clean(application.resaleState).toUpperCase()
-      : "",
-
-    resale_number: resale
-      ? clean(application.resaleNumber)
-      : "",
-
-    resale_description: resale
-      ? clean(application.resaleDescription)
-      : "",
-
     tax_document_review: resale
       ? "pending"
       : "not_applicable",
-
-    resale_certificate_storage: resale
-      ? "cloudflare_r2_private"
-      : "none",
-
-    resale_certificate_object_key: objectKey || "",
   };
+
+  if (resale) {
+    values.resale_state =
+      clean(application.resaleState).toUpperCase();
+
+    values.resale_certificate_object_key = objectKey;
+  }
 
   const metafields = Object.entries(values).map(
     ([key, value]) => ({
@@ -668,18 +685,56 @@ async function saveCompanyTaxInformation(
 
   const result = data.data?.metafieldsSet;
 
-  if (
-    !result?.metafields ||
-    result.userErrors?.length
-  ) {
+  if (result?.userErrors?.length) {
+    console.error(
+      "Company metafield errors:",
+      result.userErrors
+    );
+
     throw new Error(
-      "Shopify could not save tax information: " +
-      formatUserErrors(result)
+      result.userErrors
+        .map((error) => error.message)
+        .join("; ")
     );
   }
 
-  return result.metafields;
+  const saved = result?.metafields || [];
+
+  if (saved.length !== metafields.length) {
+    throw new Error(
+      "Shopify did not confirm all company metafields."
+    );
+  }
+
+  // Verify every returned namespace/key/value pair.
+  // The returned mutation selection must include value.
+  for (const expected of metafields) {
+    const match = saved.find(
+      (field) =>
+        field.namespace === expected.namespace &&
+        field.key === expected.key &&
+        field.value === expected.value
+    );
+
+    if (!match) {
+      throw new Error(
+        `Shopify did not confirm metafield ${expected.key}.`
+      );
+    }
+  }
+
+  console.log(
+    "Company tax metafields saved:",
+    companyId,
+    saved.map(({ namespace, key }) => ({
+      namespace,
+      key,
+    }))
+  );
+
+  return saved;
 }
+
 
 // --------------------------------------------------
 // SHOPIFY GRAPHQL HELPER
@@ -979,26 +1034,11 @@ function validateApplication(application) {
 
   if (application.resaleIntent === "yes") {
     if (
-      !clean(application.resaleState) ||
-      !clean(application.resaleNumber) ||
-      !clean(application.resaleDescription)
-    ) {
-      return "Please complete the resale tax information.";
-    }
-
-    if (
       !/^[A-Za-z]{2}$/.test(
         clean(application.resaleState)
       )
     ) {
-      return "Please enter a two-letter registration state.";
-    }
-
-    if (
-      clean(application.resaleNumber).length > 100 ||
-      clean(application.resaleDescription).length > 500
-    ) {
-      return "Resale tax information is too long.";
+      return "Please enter a valid two-letter registration state.";
     }
   }
 
