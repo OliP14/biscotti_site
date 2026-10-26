@@ -485,10 +485,11 @@ async function createShopifyCompany(
     // No exemption is granted automatically.
     taxExempt: false,
 
-    note:
-      "WHOLESALE APPLICATION STATUS: PENDING APPROVAL. " +
-      "Do not grant ordering or tax-exempt privileges " +
-      "until the application has been reviewed.",
+    // Default payment terms: Net 15
+    buyerExperienceConfiguration: {
+      paymentTermsTemplateId:
+        "gid://shopify/PaymentTermsTemplate/3",
+    },
   };
 
   if (!application.billingSameAsShipping) {
