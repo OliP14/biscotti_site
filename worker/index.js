@@ -13,11 +13,43 @@ const COMPANY_CREATE_MUTATION = `
       company {
         id
         name
+        locations(first: 1) {
+          nodes {
+            id
+          }
+        }
       }
       userErrors {
         field
         message
         code
+      }
+    }
+  }
+`;
+
+const COMPANY_PAYMENT_TERMS_MUTATION = `
+  mutation SetCompanyPaymentTerms(
+    $companyLocationId: ID!
+    $input: CompanyLocationUpdateInput!
+  ) {
+    companyLocationUpdate(
+      companyLocationId: $companyLocationId
+      input: $input
+    ) {
+      companyLocation {
+        id
+        buyerExperienceConfiguration {
+          paymentTermsTemplate {
+            id
+            name
+            dueInDays
+          }
+        }
+      }
+      userErrors {
+        field
+        message
       }
     }
   }
@@ -295,6 +327,13 @@ async function handleWholesaleApplication(request, env) {
     );
 
     companyId = company.id;
+
+    // Apply Net 15 payment terms to the new company location.
+    await setCompanyNet15(
+      company,
+      env,
+      accessToken
+    );
     
     
     // STEP 8: Store the PDF privately in R2.
@@ -534,6 +573,71 @@ async function createShopifyCompany(
 
   return result.company;
 }
+
+
+async function setCompanyNet15(
+  company,
+  env,
+  accessToken
+) {
+  const companyLocationId =
+    company.locations?.nodes?.[0]?.id;
+
+  if (!companyLocationId) {
+    throw new Error(
+      "Company created, but no location ID was returned."
+    );
+  }
+
+  const variables = {
+    companyLocationId,
+    input: {
+      buyerExperienceConfiguration: {
+        paymentTermsTemplateId:
+          "gid://shopify/PaymentTermsTemplate/3",
+      },
+    },
+  };
+
+  const data = await shopifyGraphQL(
+    env,
+    accessToken,
+    COMPANY_PAYMENT_TERMS_MUTATION,
+    variables
+  );
+
+  const result = data.data?.companyLocationUpdate;
+
+  if (
+    !result?.companyLocation ||
+    result.userErrors?.length
+  ) {
+    throw new Error(
+      "Failed to set Net 15 payment terms: " +
+      JSON.stringify(
+        result?.userErrors || data.errors || []
+      )
+    );
+  }
+
+  const terms =
+    result.companyLocation
+      .buyerExperienceConfiguration
+      ?.paymentTermsTemplate;
+
+  if (terms?.dueInDays !== 15) {
+    throw new Error(
+      "Shopify did not confirm Net 15 payment terms. " +
+      JSON.stringify(terms)
+    );
+  }
+
+  console.log(
+    "Net 15 payment terms successfully applied:",
+    companyLocationId
+  );
+}
+
 
 // --------------------------------------------------
 // CREATE COMPANY CONTACT, WITHOUT B2B ROLE
